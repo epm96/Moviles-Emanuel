@@ -143,6 +143,7 @@ aside h2{width:100%;margin:0}
 <h2>📱 Móviles Emanuel</h2>
 <button class="nav cliOnly on" id="n-client" onclick="show('client')">🛍️ Tienda</button>
 <button class="nav noCli on" id="n-screens" onclick="show('screens')">📟 Pantallas</button>
+<button class="nav noCli" id="n-accinv" onclick="show('accinv')">📦 Inv. micas/covers/cables</button>
 <button class="nav noCli" id="n-report" onclick="show('report')">📝 Reporte diario</button>
 <button class="nav noCli" id="n-history" onclick="show('history')">📅 Historial</button>
 <button class="nav noCli" id="n-profile" onclick="show('profile')">👤 Mi perfil</button>
@@ -198,6 +199,8 @@ aside h2{width:100%;margin:0}
 <select id="atipo"></select>
 <input id="anombre" placeholder="Nombre o modelo (ej. Mica iPhone 13)">
 <input id="aprecio" type="number" min="0" step="0.01" placeholder="Precio en CUP (opcional)">
+<input id="acant" type="number" min="0" step="1" placeholder="Cantidad en inventario">
+<input id="acosto" type="number" min="0" step="0.01" placeholder="Costo (lo que te costó)">
 <select id="adisp"><option value="1">Disponible</option><option value="0">No disponible</option></select>
 <input id="adesc" placeholder="Detalles (ej. 128GB, batería 90%, con cargador)">
 <input id="afoto" type="file" accept="image/*">
@@ -276,6 +279,60 @@ aside h2{width:100%;margin:0}
 </div>
 </div>
 
+<div id="v-accinv" class="hidden">
+<h3>Inventario de micas, covers y cables</h3>
+<div class="stats">
+<div class="stat"><span>Artículos</span><b id="ai1">0</b></div>
+<div class="stat"><span>Unidades</span><b id="ai2">0</b></div>
+<div class="stat"><span>Sin stock</span><b id="ai3">0</b></div>
+<div class="stat"><span>Stock bajo (≤2)</span><b id="ai5">0</b></div>
+<div class="stat adminOnly"><span>Valor (costo)</span><b id="ai4">0</b></div>
+<div class="stat adminOnly"><span>Valor (venta)</span><b id="ai6">0</b></div>
+</div>
+
+<div class="card adminOnly">
+<b id="ait">Agregar artículo al inventario</b>
+<input type="hidden" id="aiid">
+<div class="grid" style="margin-top:10px">
+<select id="aitipo"></select>
+<input id="ainombre" placeholder="Nombre o modelo (ej. Mica iPhone 13)">
+<input id="aicant" type="number" min="0" step="1" placeholder="Cantidad">
+<input id="aicosto" type="number" min="0" step="0.01" placeholder="Costo (lo que te costó)">
+<input id="aiventa" type="number" min="0" step="0.01" placeholder="Precio de venta">
+</div>
+<div class="row" style="margin-top:10px">
+<button class="green" onclick="saveAccInv()">Guardar</button>
+<button class="gray" onclick="clearAccInvForm()">Cancelar</button>
+</div>
+<p class="msg" style="margin-top:8px">Los artículos que agregues aquí también salen en la tienda de clientes. Los teléfonos de uso y demás artículos se manejan solo en «Tienda clientes» y en "Venta de mica / cover / cable" del reporte diario (descuentan stock y usan este costo).</p>
+</div>
+
+<div class="card">
+<div class="row" style="margin-bottom:10px">
+<input id="aiq" placeholder="🔍 Buscar artículo..." oninput="renderAccInv()">
+<select id="aicat" onchange="renderAccInv()"></select>
+<select id="aistock" onchange="renderAccInv()">
+<option value="all">Todo el stock</option>
+<option value="low">Stock bajo (≤2)</option>
+<option value="zero">Sin stock</option>
+</select>
+<select id="aisort" onchange="renderAccInv()">
+<option value="nombre">Ordenar: Nombre</option>
+<option value="cant">Ordenar: Menos stock</option>
+<option value="venta">Ordenar: Precio</option>
+</select>
+</div>
+<div class="scroll">
+<table>
+<thead><tr><th>Categoría</th><th>Artículo</th><th>Cantidad</th>
+<th class="adminOnly">Costo</th><th>Precio de venta</th><th class="adminOnly">Ganancia</th><th class="adminOnly">Acciones</th></tr></thead>
+<tbody id="aitb"></tbody>
+</table>
+</div>
+<p class="msg hidden" id="aiempty">No hay artículos que mostrar.</p>
+</div>
+</div>
+
 <div id="v-report" class="hidden">
 <h3>Reporte diario</h3>
 <div class="card">
@@ -283,12 +340,13 @@ aside h2{width:100%;margin:0}
 <div class="grid" style="margin-top:10px">
 <select id="rtipo" onchange="reportType()"></select>
 <select id="rpant" onchange="pickScreen()"></select>
+<select id="racc" onchange="pickAcc()"></select>
 <input id="rdet" placeholder="Detalle (opcional)">
 <input id="rcli" placeholder="Cliente (opcional)">
 <input id="rprecio" type="number" min="0" step="0.01" placeholder="Precio">
 </div>
 <div class="msg hidden" id="rhint" style="margin-top:10px"></div>
-<label class="msg adminOnly" id="rdlab" style="display:block;margin-top:10px"><input id="rdesc" type="checkbox" checked style="width:auto;margin-right:6px">Descontar 1 pantalla del inventario</label>
+<label class="msg adminOnly" id="rdlab" style="display:block;margin-top:10px"><input id="rdesc" type="checkbox" checked style="width:auto;margin-right:6px">Descontar 1 del inventario</label>
 <div class="row" style="margin-top:10px">
 <button class="green" onclick="saveReport()">Guardar en el historial</button>
 </div>
@@ -329,7 +387,7 @@ aside h2{width:100%;margin:0}
 </div>
 <div class="card">
 <b>🧾 Inversión por servicio</b>
-<p class="msg">Lo que te cuesta cada trabajo (la pieza o material). Se descuenta de tu ganancia. En "Cambio de pantalla" se usa el costo del inventario. Se aplica a todos los trabajos.</p>
+<p class="msg">Lo que te cuesta cada trabajo (la pieza o material). Se descuenta de tu ganancia. En "Cambio de pantalla" se usa el costo del inventario. En micas, covers y cables se usa el costo del artículo si lo tiene; si no, el valor de aquí. Se aplica a todos los trabajos.</p>
 <div id="invlist"></div>
 <div class="row" style="margin-top:10px"><button class="green" onclick="saveInv()">Guardar inversión</button></div>
 </div>
@@ -438,7 +496,8 @@ var cloudDoc = null, cloudReady = false, cloudLast = "", cloudMsg = "";
 var KEY = "moviles_emanuel_db_v1";
 var LOW = 2;
 var db = { users: [], screens: [], reports: [], notes: [], pay: {} };
-var TIPOS = ["Cambio de pantalla","Cambio de bocina","Cambio de batería o adaptación","Rep. base de carga tipo C","Cambio de base de carga","Cambio de botones","Pegado de pantalla","Censado","Corte en placa","Mano de obra","Otro"];
+var TIPOS = ["Cambio de pantalla","Cambio de bocina","Cambio de batería o adaptación","Rep. base de carga tipo C","Cambio de base de carga","Cambio de botones","Pegado de pantalla","Censado","Corte en placa","Mano de obra","Venta de mica","Venta de cover","Venta de cable","Otro"];
+var ACC_TIPO = { "Venta de mica": "Mica", "Venta de cover": "Cover", "Venta de cable": "Cable" };
 var me = null;
 
 function $(id){ return document.getElementById(id); }
@@ -489,6 +548,8 @@ var cloudQueued = null, cloudDB = null, cloudBaseObj = null, cloudBusy = false, 
 function cloudStatus(t){ cloudMsg = t; var e = document.getElementById("cloudst"); if (e) e.textContent = t; }
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function normalizeDB(){
+  if (!Array.isArray(db.screens)) db.screens = [];
+  if (!Array.isArray(db.users)) db.users = [];
   if (!Array.isArray(db.reports)) db.reports = [];
   if (!Array.isArray(db.notes)) db.notes = [];
   if (!db.pay || typeof db.pay !== "object" || Array.isArray(db.pay)) db.pay = {};
@@ -512,7 +573,7 @@ function mergeDiff(base, local, remote){
       var rx = arr[R[id]];
       Object.keys(lx).forEach(function(f){
         if (JSON.stringify(lx[f]) === JSON.stringify(bx[f])) return;         /* no lo cambié yo */
-        if (col === "screens" && f === "cant") rx.cant = Math.max(0, (Number(rx.cant) || 0) + (lx.cant - (Number(bx.cant) || 0)));
+        if ((col === "screens" || col === "accesorios") && f === "cant") rx.cant = Math.max(0, (Number(rx.cant) || 0) + ((Number(lx.cant) || 0) - (Number(bx.cant) || 0)));
         else rx[f] = clone(lx[f]);
       });
     });
@@ -535,11 +596,11 @@ function rebindMe(){
 function refreshUI(){
   if (!me) return;
   if (!rebindMe()) { alert("Tu usuario ya no existe."); logout(); return; }
-  var cur = ["client","acc","screens","report","history","profile","pay","notes","users","backup"]
+  var cur = ["client","acc","screens","accinv","report","history","profile","pay","notes","users","backup"]
     .filter(function(x){ return !$("v-" + x).classList.contains("hidden"); })[0] || "screens";
   var a = document.activeElement;
   var typing = a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && $("v-" + cur).contains(a);
-  if (typing && ["screens","client","history"].indexOf(cur) === -1) { updateTopbar(); return; }
+  if (typing && ["screens","accinv","client","history"].indexOf(cur) === -1) { updateTopbar(); return; }
   show(cur);
 }
 function cloudHandle(snap){
@@ -644,11 +705,12 @@ function logout(){
 function show(v){
   if (me && me.role === "cliente") v = "client";
   if ((v === "users" || v === "backup" || v === "pay" || v === "acc") && !isAdmin()) v = "screens";
-  ["client","acc","screens","report","history","profile","pay","notes","users","backup"].forEach(function(x){
+  ["client","acc","screens","accinv","report","history","profile","pay","notes","users","backup"].forEach(function(x){
     $("n-" + x).classList.toggle("on", x === v);
     $("v-" + x).classList.toggle("hidden", x !== v);
   });
   if (v === "screens") renderScreens();
+  if (v === "accinv") renderAccInv();
   if (v === "users") renderUsers();
   if (v === "report") renderReport();
   if (v === "history") renderHistory();
@@ -778,6 +840,123 @@ function delScreen(id){
   if (!confirm("¿Borrar esta pantalla?")) return;
   db.screens = db.screens.filter(function(s){ return s.id !== id; });
   saveDB(); renderScreens();
+}
+
+/* ---------- INVENTARIO DE MICAS, COVERS Y CABLES ---------- */
+function invAccList(){ var ok = {}; Object.keys(ACC_TIPO).forEach(function(k){ ok[ACC_TIPO[k]] = 1; }); return db.accesorios.filter(function(a){ return ok[a.tipo]; }); }
+function accCant(a){ return Math.max(0, Number(a.cant) || 0); }
+function fillAccInvSelects(){
+  var cats = catList().filter(function(c){ return Object.keys(ACC_TIPO).some(function(k){ return ACC_TIPO[k] === c.n; }); });
+  var s = $("aitipo"), prev = s.value; s.innerHTML = "";
+  cats.forEach(function(c){
+    var o = document.createElement("option"); o.value = c.n; o.textContent = (c.i || "🛍️") + " " + c.n; s.appendChild(o);
+  });
+  if (prev) s.value = prev;
+  var f = $("aicat"), pf = f.value; f.innerHTML = "";
+  var o0 = document.createElement("option"); o0.value = ""; o0.textContent = "Todas las categorías"; f.appendChild(o0);
+  cats.forEach(function(c){
+    var o = document.createElement("option"); o.value = c.n; o.textContent = (c.i || "🛍️") + " " + c.n; f.appendChild(o);
+  });
+  f.value = pf;
+}
+function renderAccInv(){
+  if (!me || me.role === "cliente") return;
+  fillAccInvSelects();
+  var q = $("aiq").value.trim().toLowerCase(), fc = $("aicat").value, fs = $("aistock").value, so = $("aisort").value;
+  var list = invAccList().filter(function(a){
+    var c = accCant(a);
+    if (fc && a.tipo !== fc) return false;
+    if (q && (String(a.nombre || "") + " " + String(a.tipo || "")).toLowerCase().indexOf(q) === -1) return false;
+    if (fs === "zero") return c === 0;
+    if (fs === "low") return c > 0 && c <= LOW;
+    return true;
+  });
+  list.sort(function(a, b){
+    if (so === "cant") return accCant(a) - accCant(b);
+    if (so === "venta") return (Number(a.precio) || 0) - (Number(b.precio) || 0);
+    return (String(a.tipo || "") + String(a.nombre || "")).localeCompare(String(b.tipo || "") + String(b.nombre || ""));
+  });
+  var tb = $("aitb"); tb.innerHTML = "";
+  list.forEach(function(a){
+    var tr = document.createElement("tr");
+    tr.appendChild(cell(a.tipo || ""));
+    tr.appendChild(cell(a.nombre || ""));
+    var c = accCant(a);
+    var tq = document.createElement("td");
+    var w = document.createElement("span"); w.className = "qty";
+    var n = document.createElement("span"); n.textContent = c;
+    n.className = c === 0 ? "zero" : (c <= LOW ? "low" : "");
+    w.appendChild(btn("−", "gray adminOnly", function(){ adjustAcc(a.id, -1); }));
+    w.appendChild(n);
+    w.appendChild(btn("+", "gray adminOnly", function(){ adjustAcc(a.id, 1); }));
+    tq.appendChild(w); tr.appendChild(tq);
+    var costo = Number(a.costo) || 0, precio = Number(a.precio) || 0;
+    tr.appendChild(cell(money(costo), "adminOnly"));
+    tr.appendChild(cell(money(precio)));
+    tr.appendChild(cell(money(precio - costo), "adminOnly"));
+    var td = document.createElement("td"); td.className = "adminOnly";
+    td.appendChild(btn("Editar", "", function(){ editAccInv(a.id); }));
+    td.appendChild(btn("Borrar", "red", function(){ delAccInv(a.id); }));
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+  $("aiempty").classList.toggle("hidden", list.length > 0);
+  var all = invAccList();
+  $("ai1").textContent = all.length;
+  $("ai2").textContent = all.reduce(function(t, a){ return t + accCant(a); }, 0);
+  $("ai3").textContent = all.filter(function(a){ return accCant(a) === 0; }).length;
+  $("ai5").textContent = all.filter(function(a){ return accCant(a) > 0 && accCant(a) <= LOW; }).length;
+  $("ai4").textContent = money(all.reduce(function(t, a){ return t + accCant(a) * (Number(a.costo) || 0); }, 0));
+  $("ai6").textContent = money(all.reduce(function(t, a){ return t + accCant(a) * (Number(a.precio) || 0); }, 0));
+}
+function adjustAcc(id, d){
+  if (!isAdmin()) return;
+  var a = db.accesorios.find(function(x){ return x.id === id; });
+  if (!a) return;
+  a.cant = Math.max(0, accCant(a) + d);
+  saveDB(); renderAccInv();
+}
+function clearAccInvForm(){
+  ["aiid","ainombre","aicant","aicosto","aiventa"].forEach(function(x){ $(x).value = ""; });
+  $("ait").textContent = "Agregar artículo al inventario";
+}
+function saveAccInv(){
+  if (!isAdmin()) return alert("Solo el administrador puede modificar.");
+  var nombre = $("ainombre").value.trim(), tipo = $("aitipo").value;
+  var cant = Number($("aicant").value), costo = Number($("aicosto").value) || 0, venta = Number($("aiventa").value) || 0;
+  if (!tipo) return alert("Primero crea una categoría en «Tienda clientes».");
+  if (!nombre) return alert("Escribe el nombre o modelo.");
+  if ($("aicant").value === "" || !Number.isInteger(cant) || cant < 0 || costo < 0 || venta < 0)
+    return alert("Revisa cantidad, costo y precio.");
+  var id = $("aiid").value;
+  var it = id ? db.accesorios.find(function(x){ return x.id === id; }) : null;
+  var dup = db.accesorios.some(function(x){
+    return (!it || x.id !== it.id) && x.tipo === tipo && String(x.nombre || "").toLowerCase() === nombre.toLowerCase();
+  });
+  if (dup && !confirm("Ya existe ese artículo en esa categoría. ¿Guardar de todos modos?")) return;
+  var isNew = !it;
+  if (isNew) it = { id: String(Date.now()), disp: true, desc: "" };
+  it.tipo = tipo; it.nombre = nombre; it.cant = cant; it.costo = costo; it.precio = venta;
+  if (isNew) db.accesorios.push(it);
+  saveDB(); clearAccInvForm(); renderAccInv();
+}
+function editAccInv(id){
+  if (!isAdmin()) return;
+  var a = db.accesorios.find(function(x){ return x.id === id; });
+  if (!a) return;
+  fillAccInvSelects();
+  $("aiid").value = a.id; $("aitipo").value = a.tipo; $("ainombre").value = a.nombre || "";
+  $("aicant").value = accCant(a); $("aicosto").value = Number(a.costo) > 0 ? a.costo : ""; $("aiventa").value = Number(a.precio) > 0 ? a.precio : "";
+  $("ait").textContent = "Editar artículo";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function delAccInv(id){
+  if (!isAdmin()) return;
+  var a = db.accesorios.find(function(x){ return x.id === id; });
+  if (!a || !confirm("¿Borrar este artículo? También se quitará de la tienda de clientes.")) return;
+  if (a.foto) delFoto(a.foto);
+  db.accesorios = db.accesorios.filter(function(x){ return x.id !== id; });
+  saveDB(); renderAccInv();
 }
 
 /* ---------- FOTOS (comprimidas; se guardan aparte de la base principal) ---------- */
@@ -984,14 +1163,14 @@ function fillCatSelect(){
   if (prev) s.value = prev;
 }
 function clearAccForm(){
-  ["aid","anombre","aprecio","adesc","afoto"].forEach(function(x){ $(x).value = ""; });
+  ["aid","anombre","aprecio","acant","acosto","adesc","afoto"].forEach(function(x){ $(x).value = ""; });
   $("adisp").value = "1"; $("at").textContent = "Agregar artículo";
 }
 function editAcc(a){
   if (!isAdmin()) return;
   fillCatSelect();
   $("aid").value = a.id; $("atipo").value = a.tipo; $("anombre").value = a.nombre;
-  $("aprecio").value = a.precio > 0 ? a.precio : ""; $("adisp").value = a.disp ? "1" : "0";
+  $("aprecio").value = a.precio > 0 ? a.precio : ""; $("acant").value = a.cant != null ? a.cant : ""; $("acosto").value = a.costo > 0 ? a.costo : ""; $("adisp").value = a.disp ? "1" : "0";
   $("adesc").value = a.desc || ""; $("afoto").value = "";
   $("at").textContent = "Editar artículo";
   $("at").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1011,7 +1190,7 @@ function renderAcc(){
       var d = mk("div", "item");
       d.appendChild(fotoEl(a, true));
       var tx = mk("div", "tx"); tx.appendChild(mk("span", "", a.nombre));
-      tx.appendChild(mk("small", "", (a.precio > 0 ? a.precio + " CUP · " : "") + estadoTxt(a.disp) + (a.desc ? " · " + a.desc : "")));
+      tx.appendChild(mk("small", "", (a.precio > 0 ? a.precio + " CUP · " : "") + "Stock: " + (a.cant || 0) + (a.costo > 0 ? " · costo " + a.costo : "") + " · " + estadoTxt(a.disp) + (a.desc ? " · " + a.desc : "")));
       d.appendChild(tx);
       d.appendChild(btn("✏️ Editar", "", function(){ editAcc(a); }));
       d.appendChild(btn(a.disp ? "Marcar no disponible" : "Marcar disponible", "gray", function(){
@@ -1053,7 +1232,7 @@ function saveAcc(){
   var it = id ? db.accesorios.filter(function(x){ return x.id === id; })[0] : null;
   var isNew = !it; if (isNew) it = { id: String(Date.now()) };
   it.tipo = $("atipo").value; it.nombre = n; it.disp = $("adisp").value === "1";
-  it.precio = Number($("aprecio").value) || 0; it.desc = $("adesc").value.trim();
+  it.precio = Number($("aprecio").value) || 0; it.cant = Math.max(0, Math.floor(Number($("acant").value) || 0)); it.costo = Number($("acosto").value) || 0; it.desc = $("adesc").value.trim();
   var f = $("afoto").files[0];
   var done = function(){
     if (isNew) db.accesorios.push(it);
@@ -1220,7 +1399,7 @@ function runDelete(){
   if (!confirm("¿Eliminar " + p.txt + "? No se puede deshacer." +
       (p.hist ? " No se devuelven pantallas al inventario." : ""))) return;
   p.run();
-  saveDB(); renderScreens(); updateTopbar(); delUI();
+  saveDB(); renderScreens(); renderAccInv(); updateTopbar(); delUI();
   alert("Listo, se eliminó: " + p.txt + ".");
 }
 
@@ -1328,7 +1507,11 @@ var FRASES = [
 var DIEZMO = 10;
 function metaTec(){ var m = Number(db.cfg && db.cfg.metaTec); return m > 0 ? m : 5000; }
 function invOf(tipo){ return Number(db.inv && db.inv[tipo]) || 0; }
-function costoOf(r){ return r.screenId ? (r.costo || 0) : invOf(r.tipo); }
+function costoOf(r){
+  if (r.screenId) return r.costo || 0;
+  if (r.accId) return (Number(r.costo) > 0) ? Number(r.costo) : invOf(r.tipo);
+  return invOf(r.tipo);
+}
 var invRows = [];
 function renderInv(){
   var box = $("invlist"); box.innerHTML = ""; invRows = [];
@@ -1337,7 +1520,7 @@ function renderInv(){
     var d = document.createElement("div"); d.className = "row"; d.style.marginBottom = "8px"; d.style.alignItems = "center";
     var l = document.createElement("span"); l.textContent = t;
     var inp = document.createElement("input"); inp.type = "number"; inp.min = "0"; inp.step = "0.01"; inp.value = invOf(t);
-    var h = document.createElement("span"); h.className = "msg"; h.textContent = "CUP de inversión por trabajo";
+    var h = document.createElement("span"); h.className = "msg"; h.textContent = ACC_TIPO[t] ? "CUP de inversión por venta (si el artículo no tiene costo propio)" : "CUP de inversión por trabajo";
     d.appendChild(l); d.appendChild(inp); d.appendChild(h); box.appendChild(d);
     invRows.push({ tipo: t, inp: inp });
   });
@@ -1416,7 +1599,7 @@ function renderAdminGan(f){
     var d = document.createElement("div"); d.className = "pay"; d.style.marginBottom = "10px";
     var h = document.createElement("div"); h.style.fontWeight = "700"; h.textContent = x[0] + " · " + g.n + " trabajo(s)";
     d.appendChild(h);
-    [["Cobrado a clientes", g.cobrado], ["− Inversión (costo de pantallas)", g.costo],
+    [["Cobrado a clientes", g.cobrado], ["− Inversión (pantallas, cables, micas, covers…)", g.costo],
      ["= Ganancia bruta", g.bruta], ["− Pago a técnicos", g.pago]].forEach(function(l){
       var e = document.createElement("div"); e.className = "msg"; e.textContent = l[0] + ": " + money(l[1]); d.appendChild(e);
     });
@@ -1478,8 +1661,19 @@ function renderReport(){
 }
 function reportType(){
   var isPant = $("rtipo").value === "Cambio de pantalla";
+  var cat = ACC_TIPO[$("rtipo").value] || "";
   $("rpant").classList.toggle("hidden", !isPant);
-  $("rdlab").classList.toggle("hidden", !isPant);
+  $("racc").classList.toggle("hidden", !cat);
+  $("rdlab").classList.toggle("hidden", !isPant && !cat);
+  if (cat) {
+    var as = $("racc"), prevA = as.value; as.innerHTML = "";
+    var a0 = document.createElement("option"); a0.value = ""; a0.textContent = "— Elige " + cat.toLowerCase() + " —"; as.appendChild(a0);
+    db.accesorios.filter(function(a){ return a.tipo === cat; }).sort(function(a, b){ return a.nombre.localeCompare(b.nombre); }).forEach(function(a){
+      var o = document.createElement("option"); o.value = a.id;
+      o.textContent = a.nombre + ((a.cant || 0) <= 0 ? " (sin stock)" : " (" + a.cant + ")"); as.appendChild(o);
+    });
+    as.value = prevA;
+  }
   var mo = $("rtipo").value === "Mano de obra";
   $("rprecio").placeholder = mo ? "Monto de mano de obra (lo que cobras)" : "Precio";
   $("rhint").classList.toggle("hidden", !mo);
@@ -1488,6 +1682,8 @@ function reportType(){
 function findScreen(id){
   return db.screens.find(function(s){ return s.id === id; });
 }
+function findAcc(id){ return db.accesorios.find(function(a){ return a.id === id; }); }
+function pickAcc(){ var a = findAcc($("racc").value); $("rprecio").value = a && a.precio > 0 ? a.precio : ""; }
 function pickScreen(){
   var s = findScreen($("rpant").value);
   $("rprecio").value = s ? s.venta : "";
@@ -1508,11 +1704,19 @@ function saveReport(){
       if (s.cant <= 0 && !confirm("Esa pantalla está sin stock. ¿Registrar de todos modos?")) return;
       if (s.cant > 0) { s.cant -= 1; r.descontado = true; }
     }
+  } else if (ACC_TIPO[tipo]) {
+    var ac = findAcc($("racc").value);
+    if (!ac) return alert("Elige el artículo que vendiste.");
+    r.accId = ac.id; r.detalle = ac.nombre + (det ? " · " + det : ""); r.costo = (Number(ac.costo) > 0) ? Number(ac.costo) : invOf(tipo);
+    if (!isAdmin() || $("rdesc").checked) {
+      if ((ac.cant || 0) <= 0 && !confirm("Ese artículo está sin stock. ¿Registrar de todos modos?")) return;
+      if ((ac.cant || 0) > 0) { ac.cant -= 1; r.descontado = true; }
+    }
   } else if (!det) { if (tipo === "Otro") return alert("Escribe un detalle del trabajo."); r.detalle = tipo; }
   r.pago = calcPago(tipo, precio, r.costo);
   db.reports.push(r);
   saveDB();
-  ["rpant","rdet","rcli","rprecio"].forEach(function(x){ $(x).value = ""; });
+  ["rpant","racc","rdet","rcli","rprecio"].forEach(function(x){ $(x).value = ""; });
   renderReport(); updateTopbar();
 }
 function reportItem(r, showUser){
@@ -1527,7 +1731,7 @@ function reportItem(r, showUser){
   tx.appendChild(sm); d.appendChild(tx);
   var pr = document.createElement("b"); pr.textContent = money(r.precio); d.appendChild(pr);
   if (isAdmin()) {
-    if (r.screenId || costoOf(r) > 0) {
+    if (r.screenId || r.accId || costoOf(r) > 0) {
       var g = document.createElement("small"); g.textContent = "ganancia " + money(r.precio - costoOf(r)); d.appendChild(g);
     }
     d.appendChild(btn("Borrar", "red", function(){ delReport(r.id); }));
@@ -1537,10 +1741,10 @@ function reportItem(r, showUser){
 function delReport(id){
   if (!isAdmin()) return;
   var r = db.reports.find(function(x){ return x.id === id; });
-  if (!r || !confirm("¿Borrar este trabajo del historial?" + (r.descontado ? " Se devolverá 1 pantalla al inventario." : ""))) return;
+  if (!r || !confirm("¿Borrar este trabajo del historial?" + (r.descontado ? " Se devolverá 1 unidad al inventario." : ""))) return;
   if (r.descontado) {
-    var s = db.screens.find(function(x){ return x.id === r.screenId; });
-    if (s) s.cant += 1;
+    var s = r.accId ? db.accesorios.find(function(x){ return x.id === r.accId; }) : db.screens.find(function(x){ return x.id === r.screenId; });
+    if (s) s.cant = (s.cant || 0) + 1;
   }
   db.reports = db.reports.filter(function(x){ return x.id !== id; });
   saveDB(); renderHistory(); renderReport(); updateTopbar();
