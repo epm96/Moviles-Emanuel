@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Móviles Emanuel</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#0b1220;color:#e5e9f2}
+.hidden{display:none!important}
+.tech .adminOnly{display:none!important}
+input,select,button{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #2a3550;background:#111a2e;color:#e5e9f2;width:100%}
+button{background:#3b82f6;border:0;color:#fff;font-weight:600;cursor:pointer}
+button:hover{opacity:.9}
+button.red{background:#dc2626}
+button.gray{background:#334155}
+button.green{background:#16a34a}
+button.sm{width:auto;padding:6px 10px;font-size:13px;margin:2px}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+background:radial-gradient(circle at 20% 20%,#1d4ed8 0,transparent 40%),radial-gradient(circle at 80% 80%,#7c3aed 0,transparent 40%),#0b1220}
+.box{width:100%;max-width:380px;background:#ffffff14;backdrop-filter:blur(14px);border:1px solid #ffffff26;border-radius:20px;padding:30px}
+.logo{font-size:44px;text-align:center}
+.box h1{text-align:center;margin:6px 0 2px;font-size:26px}
+.box p{text-align:center;margin:0 0 18px;color:#aab4c8}
+.box input{margin-bottom:12px}
+#err{color:#fca5a5;text-align:center;min-height:20px;margin-top:10px;font-size:14px}
+#app{display:flex;min-height:100vh}
+aside{width:240px;background:#0f172a;border-right:1px solid #1e293b;padding:18px;display:flex;flex-direction:column;gap:8px}
+aside h2{margin:0 0 14px;font-size:19px}
+.nav{background:transparent;text-align:left;color:#cbd5e1}
+.nav.on{background:#1d4ed8;color:#fff}
+.who{margin-top:auto;font-size:13px;color:#94a3b8}
+main{flex:1;padding:22px;min-width:0}
+h3{margin:0 0 14px;font-size:22px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:#111a2e;border:1px solid #1e293b;border-radius:14px;padding:14px}
+.stat span{color:#94a3b8;font-size:13px}
+.stat b{display:block;font-size:24px;margin-top:4px}
+.card{background:#111a2e;border:1px solid #1e293b;border-radius:14px;padding:16px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1;min-width:140px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:11px 8px;border-bottom:1px solid #1e293b;text-align:left}
+th{color:#94a3b8;font-size:12px;text-transform:uppercase}
+.zero{color:#f87171;font-weight:700}
+.low{color:#fbbf24;font-weight:700}
+.msg{color:#94a3b8;font-size:14px}
+textarea{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #2a3550;background:#111a2e;color:#e5e9f2;width:100%;min-height:90px;resize:vertical}
+.day{margin-bottom:14px}
+.day h4{margin:0 0 6px;font-size:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.day h4 span{color:#4ade80}
+.item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #1e293b;flex-wrap:wrap}
+.item .tx{flex:1;min-width:180px}
+.item small{color:#94a3b8;display:block}
+.tag{background:#1d4ed8;border-radius:8px;padding:2px 8px;font-size:12px}
+.pay{background:#0f2a1a;border:1px solid #166534;border-radius:12px;padding:12px;margin-top:10px}
+.pay b{font-size:18px;color:#4ade80}
+.cli .noCli{display:none!important}
+body:not(.cli) .cliOnly{display:none!important}
+.ok{color:#4ade80;font-weight:700}
+#topbar{position:sticky;top:0;z-index:10;background:#0f172a;border-bottom:1px solid #1e293b;overflow:hidden}
+#tfill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#1d4ed8,#16a34a);opacity:.55;transition:width .5s}
+#topbar.gold #tfill{background:linear-gradient(90deg,#f59e0b,#ef4444);opacity:.75}
+#ttxt{position:relative;padding:11px 16px;font-weight:600;font-size:15px;text-align:center}
+.qty{display:inline-flex;align-items:center;gap:6px}
+.qty button{width:30px;padding:4px 0}
+@media(max-width:760px){
+#app{flex-direction:column}
+aside{width:100%;flex-direction:row;flex-wrap:wrap;align-items:center}
+aside h2{width:100%;margin:0}
+.nav{width:auto}
+.who{margin:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<section id="login">
+<div class="box">
+<div class="logo">📱</div>
+<h1>Móviles Emanuel</h1>
+<p>Taller de celulares</p>
+<input id="lu" placeholder="Usuario" autocomplete="username">
+<input id="lp" type="password" placeholder="Contraseña" autocomplete="current-password">
+<button onclick="login()">Entrar</button>
+<button class="gray" style="margin-top:10px" onclick="enterClient()">👀 Ver inventario (clientes)</button>
+<div id="err"></div>
+</div>
+</section>
+
+<div id="topbar" class="hidden"><div id="tfill"></div><div id="ttxt"></div></div>
+
+<div id="app" class="hidden">
+<aside>
+<h2>📱 Móviles Emanuel</h2>
+<button class="nav cliOnly on" id="n-client" onclick="show('client')">📟 Inventario</button>
+<button class="nav noCli on" id="n-screens" onclick="show('screens')">📟 Pantallas</button>
+<button class="nav noCli" id="n-report" onclick="show('report')">📝 Reporte diario</button>
+<button class="nav noCli" id="n-history" onclick="show('history')">📅 Historial</button>
+<button class="nav noCli" id="n-profile" onclick="show('profile')">👤 Mi perfil</button>
+<button class="nav adminOnly" id="n-pay" onclick="show('pay')">💵 Pagos técnico</button>
+<button class="nav noCli" id="n-notes" onclick="show('notes')">🗒️ Notas</button>
+<button class="nav adminOnly" id="n-acc" onclick="show('acc')">🛍️ Catálogo clientes</button>
+<button class="nav adminOnly" id="n-users" onclick="show('users')">👥 Usuarios</button>
+<button class="nav adminOnly" id="n-backup" onclick="show('backup')">💾 Respaldo</button>
+<button class="gray" onclick="logout()">Cerrar sesión</button>
+<div class="who" id="who"></div>
+</aside>
+
+<main>
+<div id="v-client" class="hidden">
+<h3>📟 Pantallas disponibles</h3>
+<button class="gray sm adminOnly" onclick="show('acc')">← Volver</button>
+<div class="card">
+<input id="cq" placeholder="🔍 Buscar marca o modelo..." oninput="renderClient()">
+<div class="scroll" style="margin-top:10px">
+<table style="min-width:0"><thead><tr><th>Marca</th><th>Modelo</th><th>Estado</th></tr></thead><tbody id="cltb"></tbody></table>
+</div>
+<p class="msg hidden" id="clempty">No hay pantallas que mostrar.</p>
+</div>
+<div class="card"><b>🛍️ Micas y covers</b><div id="calist" style="margin-top:8px"></div></div>
+</div>
+
+<div id="v-acc" class="hidden">
+<h3>Catálogo para clientes</h3>
+<div class="card">
+<b>Micas y covers</b>
+<p class="msg">Marca qué micas y covers tienes en el taller. Los clientes ven solo "Disponible" o "No disponible en el momento".</p>
+<div class="grid" style="margin-top:10px">
+<select id="atipo"><option>Mica</option><option>Cover</option><option>Otro</option></select>
+<input id="anombre" placeholder="Modelo (ej. iPhone 13)">
+<select id="adisp"><option value="1">Disponible</option><option value="0">No disponible</option></select>
+<button class="green" onclick="addAcc()">Agregar</button>
+</div>
+<div id="acclist" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<b>Compartir con clientes</b>
+<p class="msg">En esta app los datos se guardan solo en tu navegador, por eso un cliente no los vería desde su teléfono. Exporta la página para clientes (muestra pantallas y accesorios, sin cantidades ni precios), súbela a un hosting gratis (por ejemplo Netlify Drop o GitHub Pages) y comparte el link. Cuando cambie tu inventario, vuelve a exportarla y subirla.</p>
+<div class="row">
+<button onclick="show('client')">👀 Ver como cliente</button>
+<button class="green" onclick="exportCatalogo()">⬇️ Exportar página para clientes</button>
+</div>
+</div>
+</div>
+
+<div id="v-screens">
+<h3>Inventario de pantallas</h3>
+<div class="stats">
+<div class="stat"><span>Modelos</span><b id="s1">0</b></div>
+<div class="stat"><span>Unidades</span><b id="s2">0</b></div>
+<div class="stat"><span>Sin stock</span><b id="s3">0</b></div>
+<div class="stat"><span>Stock bajo (≤2)</span><b id="s5">0</b></div>
+<div class="stat adminOnly"><span>Valor (costo)</span><b id="s4">0</b></div>
+<div class="stat adminOnly"><span>Valor (venta)</span><b id="s6">0</b></div>
+</div>
+
+<div class="card adminOnly">
+<b id="ft">Agregar pantalla</b>
+<input type="hidden" id="fid">
+<div class="grid" style="margin-top:10px">
+<input id="fmarca" placeholder="Marca" list="marcas">
+<datalist id="marcas"></datalist>
+<input id="fmodelo" placeholder="Modelo">
+<input id="fcant" type="number" min="0" step="1" placeholder="Cantidad">
+<input id="fcosto" type="number" min="0" step="0.01" placeholder="Costo">
+<input id="fventa" type="number" min="0" step="0.01" placeholder="Precio de venta">
+</div>
+<div class="row" style="margin-top:10px">
+<button class="green" onclick="saveScreen()">Guardar</button>
+<button class="gray" onclick="clearForm()">Cancelar</button>
+</div>
+</div>
+
+<div class="card">
+<div class="row" style="margin-bottom:10px">
+<input id="q" placeholder="🔍 Buscar marca o modelo..." oninput="renderScreens()">
+<select id="fstock" onchange="renderScreens()">
+<option value="all">Todo el stock</option>
+<option value="low">Stock bajo (≤2)</option>
+<option value="zero">Sin stock</option>
+</select>
+<select id="fsort" onchange="renderScreens()">
+<option value="marca">Ordenar: Marca</option>
+<option value="cant">Ordenar: Menos stock</option>
+<option value="venta">Ordenar: Precio</option>
+</select>
+</div>
+<div class="scroll">
+<table>
+<thead><tr><th>Marca</th><th>Modelo</th><th>Cantidad</th>
+<th class="adminOnly">Costo</th><th>Precio de venta</th><th class="adminOnly">Ganancia</th><th class="adminOnly">Acciones</th></tr></thead>
+<tbody id="tb"></tbody>
+</table>
+</div>
+<p class="msg hidden" id="empty">No hay pantallas que mostrar.</p>
+</div>
+</div>
+
+<div id="v-report" class="hidden">
+<h3>Reporte diario</h3>
+<div class="card">
+<b>Registrar trabajo</b>
+<div class="grid" style="margin-top:10px">
+<select id="rtipo" onchange="reportType()"></select>
+<select id="rpant" onchange="pickScreen()"></select>
+<input id="rdet" placeholder="Detalle (opcional)">
+<input id="rcli" placeholder="Cliente (opcional)">
+<input id="rprecio" type="number" min="0" step="0.01" placeholder="Precio">
+</div>
+<div class="msg hidden" id="rhint" style="margin-top:10px"></div>
+<label class="msg adminOnly" id="rdlab" style="display:block;margin-top:10px"><input id="rdesc" type="checkbox" checked style="width:auto;margin-right:6px">Descontar 1 pantalla del inventario</label>
+<div class="row" style="margin-top:10px">
+<button class="green" onclick="saveReport()">Guardar en el historial</button>
+</div>
+</div>
+<div class="card"><b>Mis trabajos de hoy</b><div id="rtoday" style="margin-top:8px"></div></div>
+</div>
+
+<div id="v-history" class="hidden">
+<h3>Historial por fecha</h3>
+<div class="card">
+<div class="row">
+<input id="hdate" type="date" onchange="renderHistory()">
+<select id="huser" class="adminOnly" onchange="renderHistory()"></select>
+<button class="gray" onclick="$('hdate').value='';renderHistory()">Ver todos los días</button>
+</div>
+</div>
+<div id="hlist"></div>
+</div>
+
+<div id="v-profile" class="hidden">
+<h3>Mi perfil</h3>
+<div class="card">
+<p class="msg">Escribe tu nombre. Saldrá en tu mensaje de motivación.</p>
+<div class="grid">
+<input id="pname" placeholder="Tu nombre" maxlength="30">
+<button class="green" onclick="saveProfile()">Guardar perfil</button>
+</div>
+<p class="msg" id="pshow" style="margin-top:10px"></p>
+</div>
+</div>
+
+<div id="v-pay" class="hidden">
+<h3>Pagos al técnico</h3>
+<div class="card">
+<p class="msg">Define cuánto se le paga al técnico por cada tipo de trabajo: un monto fijo por trabajo, un % de la ganancia (lo cobrado − la inversión), o mitad por mitad (la mitad de la ganancia: en mano de obra es la mitad de lo cobrado; en pantallas, la mitad de precio menos costo; si el servicio tiene inversión, se descuenta primero). Los cambios se aplican a todos los trabajos, también a los ya registrados.</p>
+<div id="paylist"></div>
+<div class="row" style="margin-top:10px"><button class="green" onclick="savePay()">Guardar pagos</button></div>
+</div>
+<div class="card">
+<b>🧾 Inversión por servicio</b>
+<p class="msg">Lo que te cuesta cada trabajo (la pieza o material). Se descuenta de tu ganancia. En "Cambio de pantalla" se usa el costo del inventario. Se aplica a todos los trabajos.</p>
+<div id="invlist"></div>
+<div class="row" style="margin-top:10px"><button class="green" onclick="saveInv()">Guardar inversión</button></div>
+</div>
+<div class="card">
+<b>Resumen para pagar</b>
+<div class="row" style="margin-top:10px"><input id="pdate" type="date" onchange="renderPaySummary()"></div>
+<div id="paysum" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<b>💰 Mis ganancias (admin)</b>
+<p class="msg">Usa la fecha de arriba. Ganancia real = lo cobrado − lo que invertiste (costo de pantallas) − lo que se paga a los técnicos.</p>
+<div class="grid" style="margin-bottom:12px">
+<div><span class="msg">🎯 Meta diaria (CUP)</span><input id="gdia" type="number" min="0" step="1"></div>
+<div><span class="msg">🎯 Meta mensual (CUP)</span><input id="gmes" type="number" min="0" step="1"></div>
+<div><span class="msg">🎯 Meta diaria del técnico (CUP)</span><input id="gtec" type="number" min="0" step="1"></div>
+<div style="align-self:end"><button class="green" onclick="saveMetas()">Guardar metas</button></div>
+</div>
+<div id="adminGan"></div>
+</div>
+</div>
+
+<div id="v-notes" class="hidden">
+<h3>Notas</h3>
+<div class="card">
+<textarea id="ntext" placeholder="Escribe una nota..."></textarea>
+<div class="row" style="margin-top:10px"><button class="green" onclick="addNote()">Guardar nota</button></div>
+</div>
+<div class="card" id="nlist"></div>
+</div>
+
+<div id="v-users" class="hidden">
+<h3>Usuarios</h3>
+<div class="card">
+<div class="grid">
+<input id="nuser" placeholder="Usuario">
+<input id="npass" type="password" placeholder="Contraseña">
+<select id="nrole"><option value="tecnico">Técnico</option><option value="admin">Administrador</option><option value="cliente">Cliente (solo ve el inventario)</option></select>
+<button onclick="addUser()">Crear usuario</button>
+</div>
+</div>
+<div class="card">
+<b>Cambiar mi contraseña</b>
+<div class="grid" style="margin-top:10px">
+<input id="cpass" type="password" placeholder="Nueva contraseña">
+<button class="green" onclick="changePass()">Guardar contraseña</button>
+</div>
+</div>
+<div class="card" id="ulist"></div>
+</div>
+
+<div id="v-backup" class="hidden">
+<h3>Base de datos y respaldo</h3>
+<div class="card">
+<p class="msg" id="cloudst">☁️</p>
+<p class="msg">Los datos se guardan solos en este navegador. Descarga un respaldo para no perderlos. Para compartir la app con otra persona con todo ya cargado, usa «Exportar app con datos incluidos» y envía ese archivo.</p>
+<div class="row">
+<button class="green" onclick="exportDB()">⬇️ Exportar respaldo</button>
+<button onclick="document.getElementById('file').click()">⬆️ Importar respaldo</button>
+<button class="gray" onclick="exportCSV()">📄 Exportar a Excel (CSV)</button>
+<button class="green" onclick="exportConDatos()">📦 Exportar app con datos incluidos</button>
+</div>
+<input type="file" id="file" accept=".json" class="hidden" onchange="importDB(event)">
+</div>
+<div class="card">
+<b>🗑️ Zona de borrado</b>
+<p class="msg">Elige qué quieres eliminar. Te recomiendo exportar un respaldo antes.</p>
+<div class="grid">
+<select id="dtipo" onchange="delUI()">
+<option value="inv_all">📟 Todo el inventario de pantallas</option>
+<option value="inv_zero">0️⃣ Poner todas las cantidades en 0</option>
+<option value="hist_user">📅 Historial de un usuario (técnico o admin)</option>
+<option value="hist_all">📅 Historial de TODOS</option>
+<option value="notes">🗒️ Todas las notas</option>
+<option value="acc">🛍️ Micas y covers del catálogo</option>
+<option value="pay">💵 Pagos configurados (volver a 0)</option>
+</select>
+<select id="duser" class="hidden" onchange="delUI()"></select>
+<select id="dscope" class="hidden" onchange="delUI()">
+<option value="all">Todas las fechas</option>
+<option value="day">Un día en específico</option>
+</select>
+<input id="ddate" type="date" class="hidden" onchange="delUI()">
+</div>
+<p class="msg" id="dinfo" style="margin-top:10px"></p>
+<div class="row" style="margin-top:10px"><button class="red" onclick="runDelete()">Eliminar lo seleccionado</button></div>
+</div>
+</div>
+</main>
+</div>
+
+<script id="seed" type="application/json">null</script>
+<script>
+"use strict";
+var SRC = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+/* ====== CONFIGURACIÓN DE FIREBASE: pega aquí tus datos (ver guía) ====== */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAfMx5zgtrraNpx_TR2zMmHCZZk06eAaV0",
+  authDomain: "moviles-emanuel.firebaseapp.com",
+  projectId: "moviles-emanuel",
+  storageBucket: "moviles-emanuel.firebasestorage.app",
+  messagingSenderId: "55994265353",
+  appId: "1:55994265353:web:1b8e2f93e0d463028cadd8"
+};
+/* ======================================================================= */
+var cloudDoc = null, cloudReady = false, cloudLast = "", cloudMsg = "";
+var KEY = "moviles_emanuel_db_v1";
+var LOW = 2;
+var db = { users: [], screens: [], reports: [], notes: [], pay: {} };
+var TIPOS = ["Cambio de pantalla","Cambio de bocina","Cambio de batería o adaptación","Rep. base de carga tipo C","Cambio de base de carga","Cambio de botones","Pegado de pantalla","Mano de obra","Otro"];
+var me = null;
+
+function $(id){ return document.getElementById(id); }
+
+function defaults(){
+  return [
+    { user: "admin", pass: "admin123", role: "admin" },
+    { user: "tecnico", pass: "tecnico123", role: "tecnico" }
+  ];
+}
+function loadDB(){
+  var had = false;
+  try { var s = localStorage.getItem(KEY); if (s) { db = JSON.parse(s); had = true; } } catch(e) {}
+  if (!had) {
+    try {
+      var seed = JSON.parse(document.getElementById("seed").textContent);
+      if (seed && Array.isArray(seed.users)) { db = seed; saveDB(); }
+    } catch(e) {}
+  }
+  if (!db || !Array.isArray(db.users) || !Array.isArray(db.screens)) db = { users: [], screens: [] };
+  if (!Array.isArray(db.reports)) db.reports = [];
+  if (!Array.isArray(db.notes)) db.notes = [];
+  if (!db.pay || typeof db.pay !== "object" || Array.isArray(db.pay)) db.pay = {};
+  ensureCfg();
+  if (db.users.length === 0) { db.users = defaults(); saveDB(); }
+}
+function ensureCfg(){
+  if (!db.cfg || typeof db.cfg !== "object" || Array.isArray(db.cfg)) db.cfg = { metaTec: 5000, metaDia: 0, metaMes: 0 };
+  if (!Array.isArray(db.accesorios)) db.accesorios = [];
+  if (!db.inv || typeof db.inv !== "object" || Array.isArray(db.inv))
+    db.inv = { "Rep. base de carga tipo C": 200, "Cambio de base de carga": 200 };
+}
+function roleLabel(r){ return r === "admin" ? "Administrador" : (r === "cliente" ? "Cliente" : "Técnico"); }
+function saveDB(){
+  try { localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch(e) { alert("No se pudo guardar en el navegador."); }
+  cloudPush();
+}
+loadDB();
+cloudInit();
+
+/* ---------- NUBE (Firebase Firestore) ---------- */
+function cloudStatus(t){ cloudMsg = t; var e = document.getElementById("cloudst"); if (e) e.textContent = t; }
+function cloudInit(){
+  if (typeof firebase === "undefined" || !FIREBASE_CONFIG.projectId || FIREBASE_CONFIG.projectId.indexOf("PEGA") === 0) {
+    cloudStatus("☁️ Nube no configurada: los datos solo están en este teléfono.");
+    return;
+  }
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    cloudDoc = firebase.firestore().collection("moviles").doc("db");
+    cloudStatus("☁️ Conectando…");
+    cloudDoc.onSnapshot(function(snap){
+      if (snap.metadata.hasPendingWrites) return;
+      if (!snap.exists) { cloudReady = true; cloudPush(); return; }
+      var js = snap.data().json;
+      cloudReady = true;
+      if (js === cloudLast) { cloudStatus("☁️ Sincronizado"); return; }
+      try {
+        var d = JSON.parse(js);
+        if (!d || !Array.isArray(d.users) || !Array.isArray(d.screens) || d.users.length === 0) throw new Error("x");
+        db = d;
+        if (!Array.isArray(db.reports)) db.reports = [];
+        if (!Array.isArray(db.notes)) db.notes = [];
+        if (!db.pay || typeof db.pay !== "object" || Array.isArray(db.pay)) db.pay = {};
+        ensureCfg();
+        cloudLast = js;
+        try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e) {}
+        if (me) {
+          var cur = ["client","acc","screens","report","history","profile","pay","notes","users","backup"]
+            .filter(function(x){ return !$("v-" + x).classList.contains("hidden"); })[0] || "screens";
+          show(cur);
+        }
+        cloudStatus("☁️ Sincronizado (datos actualizados desde la nube)");
+      } catch(e) { cloudStatus("☁️ Los datos de la nube no son válidos."); }
+    }, function(err){ cloudStatus("☁️ Sin conexión con la nube (" + (err && err.code || "error") + "). Se usan los datos de este teléfono."); });
+  } catch(e) { cloudStatus("☁️ Error en la configuración de Firebase."); }
+}
+function cloudPush(){
+  if (!cloudDoc || !cloudReady) return;
+  var js = JSON.stringify(db);
+  if (js === cloudLast) return;
+  cloudLast = js;
+  cloudDoc.set({ json: js, t: Date.now() })
+    .then(function(){ cloudStatus("☁️ Sincronizado"); })
+    .catch(function(){ cloudLast = ""; cloudStatus("☁️ No se pudo subir el último cambio. Revisa internet."); });
+}
+
+function isAdmin(){ return me && me.role === "admin"; }
+
+function login(){
+  var u = $("lu").value.trim().toLowerCase(), p = $("lp").value;
+  var f = db.users.find(function(x){ return x.user.toLowerCase() === u && x.pass === p; });
+  if (!f) { $("err").textContent = "Usuario o contraseña incorrectos"; return; }
+  enterApp(f);
+}
+function enterClient(){ enterApp({ user: "cliente", role: "cliente" }); }
+function enterApp(f){
+  me = f; $("err").textContent = "";
+  $("login").classList.add("hidden"); $("app").classList.remove("hidden");
+  document.body.classList.toggle("tech", !isAdmin());
+  document.body.classList.toggle("cli", f.role === "cliente");
+  updateWho();
+  show(f.role === "cliente" ? "client" : "screens");
+}
+function logout(){
+  me = null; updateTopbar();
+  $("app").classList.add("hidden"); $("login").classList.remove("hidden");
+  $("lu").value = ""; $("lp").value = "";
+  document.body.classList.remove("tech"); document.body.classList.remove("cli");
+}
+["lu","lp"].forEach(function(id){
+  $(id).addEventListener("keydown", function(e){ if (e.key === "Enter") login(); });
+});
+
+function show(v){
+  if (me && me.role === "cliente") v = "client";
+  if ((v === "users" || v === "backup" || v === "pay" || v === "acc") && !isAdmin()) v = "screens";
+  ["client","acc","screens","report","history","profile","pay","notes","users","backup"].forEach(function(x){
+    $("n-" + x).classList.toggle("on", x === v);
+    $("v-" + x).classList.toggle("hidden", x !== v);
+  });
+  if (v === "screens") renderScreens();
+  if (v === "users") renderUsers();
+  if (v === "report") renderReport();
+  if (v === "history") renderHistory();
+  if (v === "notes") renderNotes();
+  if (v === "pay") renderPay();
+  if (v === "profile") renderProfile();
+  if (v === "backup") renderBackup();
+  if (v === "client") renderClient();
+  if (v === "acc") renderAcc();
+  updateTopbar();
+}
+
+function money(n){ return Number(n || 0).toFixed(2); }
+function cell(text, cls){
+  var td = document.createElement("td");
+  td.textContent = text;
+  if (cls) td.className = cls;
+  return td;
+}
+function btn(label, cls, fn){
+  var b = document.createElement("button");
+  b.className = "sm " + cls; b.textContent = label; b.onclick = fn;
+  return b;
+}
+
+function renderScreens(){
+  var q = $("q").value.trim().toLowerCase();
+  var fs = $("fstock").value, so = $("fsort").value;
+  var list = db.screens.filter(function(s){
+    if (q && (s.marca + " " + s.modelo).toLowerCase().indexOf(q) === -1) return false;
+    if (fs === "zero") return s.cant === 0;
+    if (fs === "low") return s.cant <= LOW;
+    return true;
+  });
+  list.sort(function(a, b){
+    if (so === "cant") return a.cant - b.cant;
+    if (so === "venta") return a.venta - b.venta;
+    return (a.marca + a.modelo).localeCompare(b.marca + b.modelo);
+  });
+
+  var tb = $("tb"); tb.innerHTML = "";
+  list.forEach(function(s){
+    var tr = document.createElement("tr");
+    tr.appendChild(cell(s.marca));
+    tr.appendChild(cell(s.modelo));
+
+    var tq = document.createElement("td");
+    var w = document.createElement("span"); w.className = "qty";
+    var minus = btn("−", "gray adminOnly", function(){ adjust(s.id, -1); });
+    var n = document.createElement("span");
+    n.textContent = s.cant;
+    n.className = s.cant === 0 ? "zero" : (s.cant <= LOW ? "low" : "");
+    var plus = btn("+", "gray adminOnly", function(){ adjust(s.id, 1); });
+    w.appendChild(minus); w.appendChild(n); w.appendChild(plus);
+    tq.appendChild(w); tr.appendChild(tq);
+
+    tr.appendChild(cell(money(s.costo), "adminOnly"));
+    tr.appendChild(cell(money(s.venta)));
+    tr.appendChild(cell(money(s.venta - s.costo), "adminOnly"));
+
+    var td = document.createElement("td"); td.className = "adminOnly";
+    td.appendChild(btn("Editar", "", function(){ editScreen(s.id); }));
+    td.appendChild(btn("Borrar", "red", function(){ delScreen(s.id); }));
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+  $("empty").classList.toggle("hidden", list.length > 0);
+
+  var all = db.screens;
+  $("s1").textContent = all.length;
+  $("s2").textContent = all.reduce(function(t, s){ return t + s.cant; }, 0);
+  $("s3").textContent = all.filter(function(s){ return s.cant === 0; }).length;
+  $("s5").textContent = all.filter(function(s){ return s.cant > 0 && s.cant <= LOW; }).length;
+  $("s4").textContent = money(all.reduce(function(t, s){ return t + s.cant * s.costo; }, 0));
+  $("s6").textContent = money(all.reduce(function(t, s){ return t + s.cant * s.venta; }, 0));
+
+  var marcas = {};
+  all.forEach(function(s){ marcas[s.marca] = 1; });
+  $("marcas").innerHTML = Object.keys(marcas).map(function(m){
+    return "<option value=\"" + m.replace(/"/g, "&quot;") + "\">";
+  }).join("");
+}
+
+function adjust(id, d){
+  if (!isAdmin()) return;
+  var s = db.screens.find(function(x){ return x.id === id; });
+  if (!s) return;
+  s.cant = Math.max(0, s.cant + d);
+  saveDB(); renderScreens();
+}
+
+function clearForm(){
+  ["fid","fmarca","fmodelo","fcant","fcosto","fventa"].forEach(function(x){ $(x).value = ""; });
+  $("ft").textContent = "Agregar pantalla";
+}
+
+function saveScreen(){
+  if (!isAdmin()) return alert("Solo el administrador puede modificar.");
+  var marca = $("fmarca").value.trim(), modelo = $("fmodelo").value.trim();
+  var cant = Number($("fcant").value), costo = Number($("fcosto").value), venta = Number($("fventa").value);
+  if (!marca || !modelo) return alert("Escribe marca y modelo.");
+  if ($("fcant").value === "" || !Number.isInteger(cant) || cant < 0 || costo < 0 || venta < 0)
+    return alert("Revisa cantidad, costo y precio.");
+  var id = $("fid").value;
+  var dup = db.screens.some(function(s){
+    return s.id !== id && s.marca.toLowerCase() === marca.toLowerCase() && s.modelo.toLowerCase() === modelo.toLowerCase();
+  });
+  if (dup && !confirm("Ya existe esa marca y modelo. ¿Guardar de todos modos?")) return;
+  var item = { id: id || String(Date.now()), marca: marca, modelo: modelo, cant: cant, costo: costo, venta: venta };
+  var i = db.screens.findIndex(function(s){ return s.id === id; });
+  if (id && i !== -1) db.screens[i] = item; else db.screens.push(item);
+  saveDB(); clearForm(); renderScreens();
+}
+
+function editScreen(id){
+  if (!isAdmin()) return;
+  var s = db.screens.find(function(x){ return x.id === id; });
+  if (!s) return;
+  $("fid").value = s.id; $("fmarca").value = s.marca; $("fmodelo").value = s.modelo;
+  $("fcant").value = s.cant; $("fcosto").value = s.costo; $("fventa").value = s.venta;
+  $("ft").textContent = "Editar pantalla";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function delScreen(id){
+  if (!isAdmin()) return;
+  if (!confirm("¿Borrar esta pantalla?")) return;
+  db.screens = db.screens.filter(function(s){ return s.id !== id; });
+  saveDB(); renderScreens();
+}
+
+/* ---------- CATÁLOGO PARA CLIENTES ---------- */
+function renderClient(){
+  var q = $("cq").value.trim().toLowerCase();
+  var tb = $("cltb"); tb.innerHTML = "";
+  var list = db.screens.filter(function(s){ return !q || (s.marca + " " + s.modelo).toLowerCase().indexOf(q) !== -1; })
+    .sort(function(a, b){ return (a.marca + a.modelo).localeCompare(b.marca + b.modelo); });
+  list.forEach(function(s){
+    var tr = document.createElement("tr");
+    tr.appendChild(cell(s.marca)); tr.appendChild(cell(s.modelo));
+    tr.appendChild(s.cant > 0 ? cell("✅ Disponible", "ok") : cell("⛔ No disponible en el momento", "zero"));
+    tb.appendChild(tr);
+  });
+  $("clempty").classList.toggle("hidden", list.length > 0);
+  var box = $("calist"); box.innerHTML = "";
+  if (!db.accesorios.length) { box.innerHTML = '<p class="msg">Pregunta por micas y covers en el taller.</p>'; return; }
+  db.accesorios.slice().sort(function(a, b){ return (a.tipo + a.nombre).localeCompare(b.tipo + b.nombre); }).forEach(function(a){
+    var d = document.createElement("div"); d.className = "item";
+    var tx = document.createElement("div"); tx.className = "tx"; tx.textContent = a.tipo + " — " + a.nombre;
+    var st = document.createElement("b"); st.className = a.disp ? "ok" : "zero";
+    st.textContent = a.disp ? "✅ Disponible" : "⛔ No disponible en el momento";
+    d.appendChild(tx); d.appendChild(st); box.appendChild(d);
+  });
+}
+function renderAcc(){
+  var box = $("acclist"); box.innerHTML = "";
+  if (!db.accesorios.length) { box.innerHTML = '<p class="msg">Aún no has agregado micas ni covers.</p>'; return; }
+  db.accesorios.slice().sort(function(a, b){ return (a.tipo + a.nombre).localeCompare(b.tipo + b.nombre); }).forEach(function(a){
+    var d = document.createElement("div"); d.className = "item";
+    var tx = document.createElement("div"); tx.className = "tx";
+    var t = document.createElement("span"); t.className = "tag"; t.textContent = a.tipo;
+    var l = document.createElement("span"); l.textContent = " " + a.nombre;
+    var sm = document.createElement("small"); sm.textContent = a.disp ? "✅ Disponible" : "⛔ No disponible en el momento";
+    tx.appendChild(t); tx.appendChild(l); tx.appendChild(sm); d.appendChild(tx);
+    d.appendChild(btn(a.disp ? "Marcar no disponible" : "Marcar disponible", "gray", function(){
+      a.disp = !a.disp; saveDB(); renderAcc();
+    }));
+    d.appendChild(btn("Borrar", "red", function(){
+      if (!confirm("¿Borrar este artículo?")) return;
+      db.accesorios = db.accesorios.filter(function(x){ return x.id !== a.id; });
+      saveDB(); renderAcc();
+    }));
+    box.appendChild(d);
+  });
+}
+function addAcc(){
+  if (!isAdmin()) return;
+  var n = $("anombre").value.trim();
+  if (!n) return alert("Escribe el modelo o nombre.");
+  db.accesorios.push({ id: String(Date.now()), tipo: $("atipo").value, nombre: n, disp: $("adisp").value === "1" });
+  saveDB(); $("anombre").value = ""; renderAcc();
+}
+var CAT_TPL = [
+  "<!DOCTYPE html>",
+  "<html lang=\"es\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+  "<title>Móviles Emanuel · Disponibilidad<\/title>",
+  "<style>",
+  "*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#0b1220;color:#e5e9f2}",
+  ".wrap{max-width:720px;margin:0 auto;padding:20px}h1{margin:0 0 4px;font-size:26px}h2{margin:26px 0 10px;font-size:20px}",
+  ".sub{color:#94a3b8;font-size:14px;margin:0 0 14px}",
+  "input{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #2a3550;background:#111a2e;color:#e5e9f2;width:100%;margin-bottom:12px}",
+  ".it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:#111a2e;border:1px solid #1e293b;border-radius:12px;margin-bottom:8px}",
+  ".ok{color:#4ade80;font-weight:700}.no{color:#f87171;font-weight:700}",
+  "<\/style><\/head><body><div class=\"wrap\">",
+  "<h1>📱 Móviles Emanuel<\/h1>",
+  "<p class=\"sub\">Pantallas disponibles · Actualizado: __FECHA__<\/p>",
+  "<input id=\"q\" placeholder=\"🔍 Buscar marca o modelo...\">",
+  "<div id=\"list\"><\/div>",
+  "<h2>🛍️ Micas y covers<\/h2>",
+  "<div id=\"acc\"><\/div>",
+  "<\/div>",
+  "<script>",
+  "var D = __DATA__;",
+  "function $(i){ return document.getElementById(i); }",
+  "function esc(t){ var d = document.createElement(\"div\"); d.textContent = t; return d.innerHTML; }",
+  "function row(a, b, ok){",
+  "  return '<div class=\"it\"><div><b>' + esc(a) + '<\/b> ' + esc(b) + '<\/div><span class=\"' + (ok ? 'ok' : 'no') + '\">' +",
+  "    (ok ? '✅ Disponible' : '⛔ No disponible en el momento') + '<\/span><\/div>';",
+  "}",
+  "function render(){",
+  "  var q = $(\"q\").value.trim().toLowerCase();",
+  "  var s = D.s.filter(function(x){ return !q || (x[0] + \" \" + x[1]).toLowerCase().indexOf(q) !== -1; })",
+  "    .sort(function(a, b){ return (a[0] + a[1]).localeCompare(b[0] + b[1]); });",
+  "  $(\"list\").innerHTML = s.length ? s.map(function(x){ return row(x[0], x[1], x[2]); }).join(\"\") : '<p class=\"sub\">No hay resultados.<\/p>';",
+  "}",
+  "$(\"q\").oninput = render; render();",
+  "var A = D.a.slice().sort(function(a, b){ return (a[0] + a[1]).localeCompare(b[0] + b[1]); });",
+  "$(\"acc\").innerHTML = A.length ? A.map(function(x){ return row(x[0] + \" —\", x[1], x[2]); }).join(\"\") : '<p class=\"sub\">Pregunta por micas y covers en el taller.<\/p>';",
+  "<\/script><\/body><\/html>"
+].join("\n");
+function exportCatalogo(){
+  if (!isAdmin()) return;
+  var data = {
+    s: db.screens.map(function(x){ return [x.marca, x.modelo, x.cant > 0 ? 1 : 0]; }),
+    a: db.accesorios.map(function(x){ return [x.tipo, x.nombre, x.disp ? 1 : 0]; })
+  };
+  var json = JSON.stringify(data).replace(/</g, "\\u003c");
+  var page = CAT_TPL.replace("__FECHA__", function(){ return new Date().toLocaleString("es"); })
+                    .replace("__DATA__", function(){ return json; });
+  download("catalogo-moviles-emanuel.html", page, "text/html");
+}
+
+/* ---------- ZONA DE BORRADO (ADMIN) ---------- */
+function renderBackup(){
+  var us = $("duser"), prev = us.value;
+  us.innerHTML = "";
+  db.users.forEach(function(u){
+    var o = document.createElement("option"); o.value = u.user;
+    o.textContent = nombreDe(u) + " (" + (u.role === "admin" ? "Admin" : "Técnico") + ")";
+    us.appendChild(o);
+  });
+  if (prev) us.value = prev;
+  if (!$("ddate").value) $("ddate").value = today();
+  delUI();
+}
+function delPlan(){
+  var t = $("dtipo").value, user = $("duser").value;
+  var day = $("dscope").value === "day" ? $("ddate").value : "";
+  if (t === "inv_all") return { n: db.screens.length, txt: "todo el inventario (" + db.screens.length + " modelos)",
+    run: function(){ db.screens = []; } };
+  if (t === "inv_zero") return { n: db.screens.length, txt: "las cantidades de " + db.screens.length + " modelos (quedan en 0)",
+    run: function(){ db.screens.forEach(function(s){ s.cant = 0; }); } };
+  if (t === "acc") return { n: db.accesorios.length, txt: db.accesorios.length + " mica(s)/cover(s) del catálogo",
+    run: function(){ db.accesorios = []; } };
+  if (t === "notes") return { n: db.notes.length, txt: db.notes.length + " nota(s)",
+    run: function(){ db.notes = []; } };
+  if (t === "pay") { var k = Object.keys(db.pay).length;
+    return { n: k, txt: "los pagos configurados (" + k + " servicio/s)", run: function(){ db.pay = {}; } }; }
+  var todos = t === "hist_all";
+  if ($("dscope").value === "day" && !day) return { invalid: "Elige la fecha." };
+  var u = db.users.find(function(x){ return x.user === user; });
+  var sel = function(r){ return (todos || r.user === user) && (!day || r.fecha === day); };
+  var n = db.reports.filter(sel).length;
+  return { n: n, hist: true,
+    txt: n + " trabajo(s) del historial " + (todos ? "de todos" : "de " + (u ? nombreDe(u) : user)) +
+         (day ? " del " + fechaBonita(day) : " de todas las fechas"),
+    run: function(){ db.reports = db.reports.filter(function(r){ return !sel(r); }); } };
+}
+function delUI(){
+  var t = $("dtipo").value, h = t === "hist_user" || t === "hist_all";
+  $("duser").classList.toggle("hidden", t !== "hist_user");
+  $("dscope").classList.toggle("hidden", !h);
+  $("ddate").classList.toggle("hidden", !(h && $("dscope").value === "day"));
+  var p = delPlan();
+  $("dinfo").textContent = p.invalid ? p.invalid : "Se eliminará: " + p.txt + ".";
+}
+function runDelete(){
+  if (!isAdmin()) return;
+  var p = delPlan();
+  if (p.invalid) return alert(p.invalid);
+  if (p.n === 0) return alert("No hay nada que borrar con esa selección.");
+  if (!confirm("¿Eliminar " + p.txt + "? No se puede deshacer." +
+      (p.hist ? " No se devuelven pantallas al inventario." : ""))) return;
+  p.run();
+  saveDB(); renderScreens(); updateTopbar(); delUI();
+  alert("Listo, se eliminó: " + p.txt + ".");
+}
+
+function download(name, text, type){
+  var blob = new Blob([text], { type: type });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = name; a.click();
+  URL.revokeObjectURL(url);
+}
+function exportDB(){
+  if (!isAdmin()) return;
+  download("moviles-emanuel-respaldo-" + new Date().toISOString().slice(0, 10) + ".json",
+    JSON.stringify(db, null, 2), "application/json");
+}
+function exportConDatos(){
+  if (!isAdmin()) return;
+  var json = JSON.stringify(db).replace(/</g, "\\u003c");
+  var page = SRC.replace(/(<script id="seed" type="application\/json">)[\s\S]*?(<\/script>)/, function(m, x, y){ return x + json + y; });
+  download("moviles-emanuel-con-datos.html", page, "text/html");
+}
+function exportCSV(){
+  if (!isAdmin()) return;
+  var rows = [["Marca","Modelo","Cantidad","Costo","Venta"]].concat(db.screens.map(function(s){
+    return [s.marca, s.modelo, s.cant, s.costo, s.venta];
+  }));
+  var csv = rows.map(function(r){
+    return r.map(function(c){ return "\"" + String(c).replace(/"/g, "\"\"") + "\""; }).join(",");
+  }).join("\n");
+  download("inventario-pantallas-" + new Date().toISOString().slice(0, 10) + ".csv", "\ufeff" + csv, "text/csv");
+}
+function importDB(ev){
+  if (!isAdmin()) return;
+  var file = ev.target.files[0];
+  if (!file) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try {
+      var data = JSON.parse(r.result);
+      if (!Array.isArray(data.users) || !Array.isArray(data.screens) ||
+          !data.users.some(function(u){ return u.role === "admin"; })) throw new Error("x");
+      if (!confirm("Esto reemplazará los datos actuales. ¿Continuar?")) { ev.target.value = ""; return; }
+      db = data; if (!Array.isArray(db.reports)) db.reports = []; if (!Array.isArray(db.notes)) db.notes = []; if (!db.pay || typeof db.pay !== "object") db.pay = {}; ensureCfg(); saveDB(); renderScreens();
+      alert("Respaldo importado.");
+    } catch(e) { alert("Archivo de respaldo no válido."); }
+    ev.target.value = "";
+  };
+  r.readAsText(file);
+}
+
+/* ---------- REPORTE DIARIO ---------- */
+function today(){
+  var d = new Date();
+  return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+}
+function hora(){
+  var d = new Date();
+  return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+}
+function fechaBonita(f){
+  var p = f.split("-");
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  var dias = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  return dias[d.getDay()] + " " + p[2] + "/" + p[1] + "/" + p[0];
+}
+function calcPago(tipo, precio, costo){
+  var c = db.pay[tipo] || { v: 0, m: "fijo" };
+  var v = Number(c.v) || 0;
+  if (c.m === "mitad") return Math.max(0, precio - (Number(costo) || 0)) / 2;
+  return c.m === "pct" ? Math.max(0, precio - (Number(costo) || 0)) * v / 100 : v;
+}
+function sinPago(tipo){
+  var c = db.pay[tipo];
+  return !c || (c.m !== "mitad" && !(Number(c.v) > 0));
+}
+function pagoOf(r){ return calcPago(r.tipo, r.precio, costoOf(r)); }
+
+/* ---------- PERFIL Y MOTIVACIÓN ---------- */
+function nombreDe(u){ return (u && u.nombre && u.nombre.trim()) ? u.nombre.trim() : (u ? u.user : ""); }
+function updateWho(){
+  if (!me) return;
+  $("who").textContent = nombreDe(me) + " · " + roleLabel(me.role);
+}
+function renderProfile(){
+  $("pname").value = (me && me.nombre) || "";
+  $("pshow").textContent = "Así saldrá en tu mensaje: " + nombreDe(me);
+}
+function saveProfile(){
+  if (!me) return;
+  me.nombre = $("pname").value.trim();
+  saveDB(); updateWho(); renderProfile(); updateTopbar();
+  alert("Perfil guardado.");
+}
+var FRASES = [
+  "¡Vas muy bien, {n}! Cada trabajo bien hecho es un cliente que vuelve. 💪",
+  "{n}, tu esfuerzo de hoy se nota. ¡Sigue así! 🚀",
+  "¡Excelente, {n}! Un trabajo a la vez y el día se llena de ganancias. 💰",
+  "{n}, la calidad que entregas hace crecer el taller. ¡Gracias! 🙌",
+  "¡Tú puedes, {n}! Hoy puedes superar el día de ayer. 🔥",
+  "{n}, cada pantalla y cada reparación cuentan. ¡Buen trabajo! 📱",
+  "¡Qué buen ritmo, {n}! Así se construyen los buenos días. ⭐",
+  "{n}, el que trabaja con ganas siempre cosecha. ¡Adelante! 🌟"
+];
+var DIEZMO = 10;
+function metaTec(){ var m = Number(db.cfg && db.cfg.metaTec); return m > 0 ? m : 5000; }
+function invOf(tipo){ return Number(db.inv && db.inv[tipo]) || 0; }
+function costoOf(r){ return r.screenId ? (r.costo || 0) : invOf(r.tipo); }
+var invRows = [];
+function renderInv(){
+  var box = $("invlist"); box.innerHTML = ""; invRows = [];
+  TIPOS.forEach(function(t){
+    if (t === "Cambio de pantalla") return;
+    var d = document.createElement("div"); d.className = "row"; d.style.marginBottom = "8px"; d.style.alignItems = "center";
+    var l = document.createElement("span"); l.textContent = t;
+    var inp = document.createElement("input"); inp.type = "number"; inp.min = "0"; inp.step = "0.01"; inp.value = invOf(t);
+    var h = document.createElement("span"); h.className = "msg"; h.textContent = "CUP de inversión por trabajo";
+    d.appendChild(l); d.appendChild(inp); d.appendChild(h); box.appendChild(d);
+    invRows.push({ tipo: t, inp: inp });
+  });
+}
+function saveInv(){
+  if (!isAdmin()) return;
+  for (var i = 0; i < invRows.length; i++) {
+    var v = Number(invRows[i].inp.value);
+    if (invRows[i].inp.value === "" || v < 0) return alert("Revisa la inversión de: " + invRows[i].tipo);
+  }
+  invRows.forEach(function(r){ db.inv[r.tipo] = Number(r.inp.value) || 0; });
+  saveDB(); updateTopbar(); renderPaySummary(); alert("Inversión guardada.");
+}
+function saveMetas(){
+  if (!isAdmin()) return;
+  var a = Number($("gdia").value) || 0, b = Number($("gmes").value) || 0, c = Number($("gtec").value) || 0;
+  if (a < 0 || b < 0 || c < 0) return alert("Las metas no pueden ser negativas.");
+  db.cfg.metaDia = a; db.cfg.metaMes = b; db.cfg.metaTec = c > 0 ? c : 5000;
+  saveDB(); updateTopbar(); renderPaySummary(); alert("Metas guardadas.");
+}
+var FRASES_TOP = [
+  "🔥 ¡Increíble, {n}! Ya pasaste los {m} CUP hoy. ¡Eres una máquina!",
+  "🏆 ¡{n}, rompiste la meta de {m} CUP! Hoy fue un día de campeón.",
+  "🚀 ¡Eres imparable, {n}! Más de {m} CUP y el día sigue. ¡Gracias por tu esfuerzo!",
+  "⭐ ¡{n}, nivel experto! Superaste los {m} CUP. El taller está orgulloso de ti."
+];
+function pagoDeHoy(user){
+  return db.reports.filter(function(r){ return r.fecha === today() && r.user === user; })
+    .reduce(function(t, r){ return t + pagoOf(r); }, 0);
+}
+function esAdminUser(name){
+  var u = db.users.find(function(x){ return x.user === name; });
+  return !!u && u.role === "admin";
+}
+function gananciaAdmin(filtro){
+  var o = { n: 0, cobrado: 0, costo: 0, bruta: 0, pago: 0, real: 0 };
+  db.reports.filter(filtro).forEach(function(r){
+    o.n++; o.cobrado += r.precio; o.costo += costoOf(r);
+    if (!esAdminUser(r.user)) o.pago += pagoOf(r);
+  });
+  o.bruta = o.cobrado - o.costo; o.real = o.bruta - o.pago;
+  return o;
+}
+function updateTopbar(){
+  var bar = $("topbar");
+  if (!me || me.role === "cliente") { bar.classList.add("hidden"); return; }
+  bar.classList.remove("hidden");
+  var fill = $("tfill"), txt = $("ttxt");
+  if (isAdmin()) {
+    var g = gananciaAdmin(function(r){ return r.fecha === today(); });
+    var md = Number(db.cfg.metaDia) || 0, ok = md > 0 && g.real >= md, pos = Math.max(0, g.real);
+    bar.classList.toggle("gold", ok);
+    fill.style.width = md > 0 ? Math.min(100, pos / md * 100) + "%" : "0";
+    txt.textContent = "📊 Mi ganancia real de hoy: " + money(g.real) + " CUP  (" + money(g.cobrado) +
+      " cobrado − " + money(g.costo) + " inversión − " + money(g.pago) + " técnicos) · ⛪ Diezmo " + DIEZMO + "%: " +
+      money(pos * DIEZMO / 100) + " CUP" + (md > 0 ? " · 🎯 " + Math.round(pos / md * 100) + "% de la meta" + (ok ? " ✅" : "") : "");
+    return;
+  }
+  var gan = pagoDeHoy(me.user), nm = nombreDe(me), d = new Date();
+  var META = metaTec(), pasa = gan >= META;
+  fill.style.width = Math.min(100, gan / META * 100) + "%";
+  bar.classList.toggle("gold", pasa);
+  var frase;
+  if (pasa) frase = FRASES_TOP[(d.getDate() + d.getMonth()) % FRASES_TOP.length].replace("{n}", nm).replace(/\{m\}/g, META);
+  else if (gan === 0) frase = "¡Buen día, " + nm + "! Hoy es un gran día para empezar a sumar. 💪";
+  else frase = FRASES[(d.getDate() + d.getMonth()) % FRASES.length].replace("{n}", nm) +
+    " Te faltan " + money(META - gan) + " CUP para los " + META + ".";
+  txt.textContent = "💵 " + money(gan) + " CUP hoy · ⛪ Diezmo " + DIEZMO + "%: " + money(gan * DIEZMO / 100) + " · " + frase;
+}
+function renderAdminGan(f){
+  var box = $("adminGan"); box.innerHTML = "";
+  var mes = f.slice(0, 7);
+  [["📅 " + fechaBonita(f), function(r){ return r.fecha === f; }, Number(db.cfg.metaDia) || 0],
+   ["🗓️ Acumulado del mes " + mes, function(r){ return r.fecha.slice(0, 7) === mes; }, Number(db.cfg.metaMes) || 0]].forEach(function(x){
+    var g = gananciaAdmin(x[1]);
+    var d = document.createElement("div"); d.className = "pay"; d.style.marginBottom = "10px";
+    var h = document.createElement("div"); h.style.fontWeight = "700"; h.textContent = x[0] + " · " + g.n + " trabajo(s)";
+    d.appendChild(h);
+    [["Cobrado a clientes", g.cobrado], ["− Inversión (costo de pantallas)", g.costo],
+     ["= Ganancia bruta", g.bruta], ["− Pago a técnicos", g.pago]].forEach(function(l){
+      var e = document.createElement("div"); e.className = "msg"; e.textContent = l[0] + ": " + money(l[1]); d.appendChild(e);
+    });
+    var t = document.createElement("div"); t.style.marginTop = "6px";
+    t.appendChild(document.createTextNode("💰 Ganancia real: "));
+    var b = document.createElement("b"); b.textContent = money(g.real) + " CUP";
+    if (g.real < 0) b.style.color = "#f87171";
+    t.appendChild(b); d.appendChild(t);
+    var dz = document.createElement("div"); dz.style.marginTop = "4px";
+    dz.textContent = "⛪ Diezmo (" + DIEZMO + "%): " + money(Math.max(0, g.real) * DIEZMO / 100) + " CUP";
+    d.appendChild(dz);
+    if (x[2] > 0) {
+      var mt = document.createElement("div"); mt.className = "msg"; mt.style.marginTop = "4px";
+      var pc = Math.round(Math.max(0, g.real) / x[2] * 100);
+      mt.textContent = "🎯 Meta: " + money(g.real) + " / " + money(x[2]) + " (" + pc + "%)" +
+        (g.real >= x[2] ? " ✅ ¡Meta cumplida!" : " · faltan " + money(x[2] - g.real));
+      d.appendChild(mt);
+    }
+    box.appendChild(d);
+  });
+}
+function screenName(s){ return s.marca + " " + s.modelo; }
+
+function renderReport(){
+  var sel = $("rtipo");
+  if (!sel.options.length) {
+    TIPOS.forEach(function(t){ var o = document.createElement("option"); o.value = t; o.textContent = t; sel.appendChild(o); });
+  }
+  var ps = $("rpant"), prev = ps.value;
+  ps.innerHTML = "";
+  var o0 = document.createElement("option"); o0.value = ""; o0.textContent = "— Elige la pantalla —"; ps.appendChild(o0);
+  db.screens.slice().sort(function(a, b){ return screenName(a).localeCompare(screenName(b)); }).forEach(function(s){
+    var o = document.createElement("option"); o.value = s.id;
+    o.textContent = screenName(s) + (s.cant === 0 ? " (sin stock)" : " (" + s.cant + ")");
+    ps.appendChild(o);
+  });
+  ps.value = prev;
+  reportType();
+  var box = $("rtoday"); box.innerHTML = "";
+  var mine = db.reports.filter(function(r){ return r.fecha === today() && me && r.user === me.user; });
+  if (!mine.length) { box.innerHTML = '<p class="msg">Aún no has registrado trabajos hoy.</p>'; return; }
+  mine.slice().reverse().forEach(function(r){ box.appendChild(reportItem(r, false)); });
+  var by = {};
+  mine.forEach(function(r){ var o = by[r.tipo] = by[r.tipo] || { n: 0, p: 0 }; o.n++; o.p += pagoOf(r); });
+  var pay = document.createElement("div"); pay.className = "pay";
+  Object.keys(by).forEach(function(k){
+    var l = document.createElement("div"); l.className = "msg";
+    l.textContent = k + " × " + by[k].n + " → " + money(by[k].p) + (sinPago(k) ? " ⚠️ el admin aún no configuró este pago" : "");
+    pay.appendChild(l);
+  });
+  var tot = document.createElement("div"); tot.style.marginTop = "6px";
+  var lab = document.createTextNode("💵 Tu pago de hoy: ");
+  var val = document.createElement("b"); val.textContent = money(mine.reduce(function(t, r){ return t + pagoOf(r); }, 0));
+  tot.appendChild(lab); tot.appendChild(val); pay.appendChild(tot);
+  var dzt = document.createElement("div"); dzt.className = "msg"; dzt.style.marginTop = "4px";
+  dzt.textContent = "⛪ Tu diezmo (" + DIEZMO + "%): " + money(pagoDeHoy(me.user) * DIEZMO / 100) + " CUP";
+  pay.appendChild(dzt);
+  box.appendChild(pay);
+}
+function reportType(){
+  var isPant = $("rtipo").value === "Cambio de pantalla";
+  $("rpant").classList.toggle("hidden", !isPant);
+  $("rdlab").classList.toggle("hidden", !isPant);
+  var mo = $("rtipo").value === "Mano de obra";
+  $("rprecio").placeholder = mo ? "Monto de mano de obra (lo que cobras)" : "Precio";
+  $("rhint").classList.toggle("hidden", !mo);
+  $("rhint").textContent = "💡 Escribe cuánto cobraste de mano de obra a este cliente. Puedes registrar varias en el día.";
+}
+function findScreen(id){
+  return db.screens.find(function(s){ return s.id === id; });
+}
+function pickScreen(){
+  var s = findScreen($("rpant").value);
+  $("rprecio").value = s ? s.venta : "";
+}
+function saveReport(){
+  if (!me) return;
+  var tipo = $("rtipo").value, precio = Number($("rprecio").value);
+  var det = $("rdet").value.trim(), cli = $("rcli").value.trim();
+  if ($("rprecio").value === "" || precio < 0) return alert("Escribe el precio.");
+  var r = { id: String(Date.now()), fecha: today(), hora: hora(), user: me.user, tipo: tipo,
+            detalle: det, cliente: cli, precio: precio, screenId: null, descontado: false, costo: invOf(tipo),
+            pago: 0 };
+  if (tipo === "Cambio de pantalla") {
+    var s = findScreen($("rpant").value);
+    if (!s) return alert("Elige la pantalla.");
+    r.screenId = s.id; r.detalle = screenName(s) + (det ? " · " + det : ""); r.costo = s.costo;
+    if (!isAdmin() || $("rdesc").checked) {
+      if (s.cant <= 0 && !confirm("Esa pantalla está sin stock. ¿Registrar de todos modos?")) return;
+      if (s.cant > 0) { s.cant -= 1; r.descontado = true; }
+    }
+  } else if (!det) { if (tipo === "Otro") return alert("Escribe un detalle del trabajo."); r.detalle = tipo; }
+  r.pago = calcPago(tipo, precio, r.costo);
+  db.reports.push(r);
+  saveDB();
+  ["rpant","rdet","rcli","rprecio"].forEach(function(x){ $(x).value = ""; });
+  renderReport(); updateTopbar();
+}
+function reportItem(r, showUser){
+  var d = document.createElement("div"); d.className = "item";
+  var tx = document.createElement("div"); tx.className = "tx";
+  var t = document.createElement("span"); t.className = "tag"; t.textContent = r.tipo;
+  var l1 = document.createElement("span"); l1.textContent = " " + r.detalle;
+  tx.appendChild(t); tx.appendChild(l1);
+  var sm = document.createElement("small");
+  sm.textContent = r.hora + (showUser ? " · " + r.user : "") + (r.cliente ? " · Cliente: " + r.cliente : "") +
+    (r.descontado ? " · descontó stock" : "") + " · pago " + money(pagoOf(r)) + (sinPago(r.tipo) ? " ⚠️ sin pago configurado" : "");
+  tx.appendChild(sm); d.appendChild(tx);
+  var pr = document.createElement("b"); pr.textContent = money(r.precio); d.appendChild(pr);
+  if (isAdmin()) {
+    if (r.screenId || costoOf(r) > 0) {
+      var g = document.createElement("small"); g.textContent = "ganancia " + money(r.precio - costoOf(r)); d.appendChild(g);
+    }
+    d.appendChild(btn("Borrar", "red", function(){ delReport(r.id); }));
+  }
+  return d;
+}
+function delReport(id){
+  if (!isAdmin()) return;
+  var r = db.reports.find(function(x){ return x.id === id; });
+  if (!r || !confirm("¿Borrar este trabajo del historial?" + (r.descontado ? " Se devolverá 1 pantalla al inventario." : ""))) return;
+  if (r.descontado) {
+    var s = db.screens.find(function(x){ return x.id === r.screenId; });
+    if (s) s.cant += 1;
+  }
+  db.reports = db.reports.filter(function(x){ return x.id !== id; });
+  saveDB(); renderHistory(); updateTopbar();
+}
+function renderHistory(){
+  var us = $("huser");
+  if (isAdmin() && !us.options.length) {
+    var o = document.createElement("option"); o.value = ""; o.textContent = "Todos los técnicos"; us.appendChild(o);
+    db.users.forEach(function(u){ var x = document.createElement("option"); x.value = u.user; x.textContent = u.user; us.appendChild(x); });
+  }
+  var fd = $("hdate").value, fu = isAdmin() ? us.value : (me ? me.user : "");
+  var list = db.reports.filter(function(r){ return (!fd || r.fecha === fd) && (!fu || r.user === fu); });
+  var days = {};
+  list.forEach(function(r){ (days[r.fecha] = days[r.fecha] || []).push(r); });
+  var box = $("hlist"); box.innerHTML = "";
+  var keys = Object.keys(days).sort().reverse();
+  if (!keys.length) { box.innerHTML = '<p class="msg">No hay trabajos registrados.</p>'; return; }
+  keys.forEach(function(k){
+    var card = document.createElement("div"); card.className = "card day";
+    var h = document.createElement("h4");
+    var a = document.createElement("div"); a.textContent = "📅 " + fechaBonita(k) + " · " + days[k].length + " trabajo(s)";
+    var tot = days[k].reduce(function(t, r){ return t + r.precio; }, 0);
+    var pg = days[k].reduce(function(t, r){ return t + pagoOf(r); }, 0);
+    var s = document.createElement("span"); s.textContent = "Total " + money(tot) + " · " + (isAdmin() ? "Pago técnico " : "Tu pago ") + money(pg);
+    h.appendChild(a); h.appendChild(s); card.appendChild(h);
+    days[k].slice().reverse().forEach(function(r){ card.appendChild(reportItem(r, isAdmin())); });
+    box.appendChild(card);
+  });
+}
+
+/* ---------- PAGOS AL TÉCNICO (ADMIN) ---------- */
+var payRows = [];
+function renderPay(){
+  var box = $("paylist"); box.innerHTML = ""; payRows = [];
+  TIPOS.forEach(function(t){
+    var c = db.pay[t] || { v: 0, m: "fijo" };
+    var d = document.createElement("div"); d.className = "row"; d.style.marginBottom = "8px"; d.style.alignItems = "center";
+    var l = document.createElement("span"); l.textContent = t;
+    var inp = document.createElement("input"); inp.type = "number"; inp.min = "0"; inp.step = "0.01"; inp.value = c.v;
+    var sel = document.createElement("select");
+    [["fijo", "$ fijo por trabajo"], ["pct", "% de lo cobrado − inversión"], ["mitad", "½ Mitad por mitad"]].forEach(function(o){
+      var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; sel.appendChild(op);
+    });
+    sel.value = c.m;
+    var hint = document.createElement("span"); hint.className = "msg";
+    var upd = function(){
+      var v = Number(inp.value) || 0;
+      inp.disabled = sel.value === "mitad"; inp.style.opacity = inp.disabled ? ".4" : "1";
+      hint.textContent = sel.value === "mitad" ? "Mitad por mitad: paga la mitad de la ganancia. Ej.: cobra 3000 → paga 1500"
+        : sel.value === "pct" ? "Ej.: cobra 1000, inversión 200 → paga " + money(800 * v / 100) : "Paga " + money(v) + " fijo por trabajo";
+    };
+    inp.oninput = upd; sel.onchange = upd; upd();
+    d.appendChild(l); d.appendChild(inp); d.appendChild(sel); d.appendChild(hint); box.appendChild(d);
+    payRows.push({ tipo: t, inp: inp, sel: sel });
+  });
+  renderInv();
+  $("gdia").value = db.cfg.metaDia || ""; $("gmes").value = db.cfg.metaMes || ""; $("gtec").value = metaTec();
+  if (!$("pdate").value) $("pdate").value = today();
+  renderPaySummary();
+}
+function savePay(){
+  if (!isAdmin()) return;
+  for (var i = 0; i < payRows.length; i++) {
+    var v = Number(payRows[i].inp.value);
+    if (payRows[i].sel.value !== "mitad" && (payRows[i].inp.value === "" || v < 0)) return alert("Revisa el pago de: " + payRows[i].tipo);
+  }
+  payRows.forEach(function(r){ db.pay[r.tipo] = { v: Number(r.inp.value) || 0, m: r.sel.value }; });
+  saveDB(); alert("Pagos guardados."); updateTopbar(); renderPaySummary();
+}
+function renderPaySummary(){
+  var f = $("pdate").value || today();
+  renderAdminGan(f);
+  var box = $("paysum"); box.innerHTML = "";
+  var by = {};
+  db.reports.filter(function(r){ return r.fecha === f; }).forEach(function(r){
+    var o = by[r.user] = by[r.user] || { n: 0, c: 0, p: 0, t: {} };
+    o.n++; o.c += r.precio; o.p += pagoOf(r);
+    var tt = o.t[r.tipo] = o.t[r.tipo] || { n: 0, p: 0 };
+    tt.n++; tt.p += pagoOf(r);
+  });
+  var ks = Object.keys(by);
+  if (!ks.length) { box.innerHTML = '<p class="msg">No hay trabajos en esa fecha.</p>'; return; }
+  ks.forEach(function(k){
+    var d = document.createElement("div"); d.className = "item";
+    var tx = document.createElement("div"); tx.className = "tx"; tx.textContent = k;
+    var sm = document.createElement("small"); sm.textContent = by[k].n + " trabajo(s) · cobrado " + money(by[k].c);
+    tx.appendChild(sm);
+    Object.keys(by[k].t).forEach(function(t){
+      var l = document.createElement("small");
+      l.textContent = "• " + t + " × " + by[k].t[t].n + " → " + money(by[k].t[t].p);
+      tx.appendChild(l);
+    });
+    d.appendChild(tx);
+    var b = document.createElement("b"); b.textContent = "Pagar " + money(by[k].p); d.appendChild(b);
+    box.appendChild(d);
+  });
+}
+
+/* ---------- NOTAS (ADMIN) ---------- */
+function renderNotes(){
+  var box = $("nlist"); box.innerHTML = "";
+  var list = db.notes.filter(function(n){ return isAdmin() || (me && n.user === me.user); });
+  if (!list.length) { box.innerHTML = '<p class="msg">Todavía no hay notas.</p>'; return; }
+  list.slice().reverse().forEach(function(n){
+    var d = document.createElement("div"); d.className = "item";
+    var tx = document.createElement("div"); tx.className = "tx";
+    tx.style.whiteSpace = "pre-wrap"; tx.textContent = n.texto;
+    var sm = document.createElement("small");
+    sm.textContent = fechaBonita(n.fecha) + " " + n.hora + (isAdmin() ? " · " + (n.user || "admin") : "");
+    tx.appendChild(sm); d.appendChild(tx);
+    if (isAdmin() || (me && n.user === me.user)) d.appendChild(btn("Borrar", "red", function(){
+      if (!confirm("¿Borrar esta nota?")) return;
+      db.notes = db.notes.filter(function(x){ return x.id !== n.id; });
+      saveDB(); renderNotes();
+    }));
+    box.appendChild(d);
+  });
+}
+function addNote(){
+  if (!me || me.role === "cliente") return;
+  var t = $("ntext").value.trim();
+  if (!t) return alert("Escribe la nota.");
+  db.notes.push({ id: String(Date.now()), texto: t, fecha: today(), hora: hora(), user: me.user });
+  saveDB(); $("ntext").value = ""; renderNotes();
+}
+
+function renderUsers(){
+  var box = $("ulist"); box.innerHTML = "";
+  db.users.forEach(function(u){
+    var row = document.createElement("div");
+    row.className = "row"; row.style.alignItems = "center"; row.style.marginBottom = "6px";
+    var t = document.createElement("span");
+    t.textContent = u.user + " — " + roleLabel(u.role);
+    row.appendChild(t);
+    if (me && u.user !== me.user) {
+      var b = btn("Eliminar", "red", function(){ delUser(u.user); });
+      b.style.flex = "0 0 auto"; b.style.minWidth = "0";
+      row.appendChild(b);
+    }
+    box.appendChild(row);
+  });
+}
+function addUser(){
+  if (!isAdmin()) return;
+  var u = $("nuser").value.trim().toLowerCase(), p = $("npass").value;
+  if (u.length < 3 || p.length < 4) return alert("Usuario mínimo 3 letras y contraseña mínimo 4.");
+  if (db.users.some(function(x){ return x.user.toLowerCase() === u; })) return alert("Ese usuario ya existe.");
+  db.users.push({ user: u, pass: p, role: $("nrole").value });
+  saveDB(); $("nuser").value = ""; $("npass").value = ""; renderUsers();
+}
+function delUser(name){
+  if (!isAdmin() || name === me.user) return;
+  if (!confirm("¿Eliminar al usuario " + name + "?")) return;
+  db.users = db.users.filter(function(x){ return x.user !== name; });
+  saveDB(); renderUsers();
+}
+function changePass(){
+  var p = $("cpass").value;
+  if (p.length < 4) return alert("Mínimo 4 caracteres.");
+  me.pass = p; saveDB(); $("cpass").value = "";
+  alert("Contraseña actualizada.");
+}
+</script>
+</body>
+</html>
