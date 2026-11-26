@@ -131,9 +131,16 @@ aside h2{width:100%;margin:0}
 <div class="logo">📱</div>
 <h1>Móviles Emanuel</h1>
 <p>Taller de celulares</p>
+<div id="lfields">
 <input id="lu" placeholder="Usuario" autocomplete="username">
 <input id="lp" type="password" placeholder="Contraseña" autocomplete="current-password">
-<label class="msg" style="display:flex;align-items:center;gap:8px;margin:0 0 12px"><input id="lrem" type="checkbox" checked style="width:auto;margin:0"> Recordar mi sesión en este teléfono</label>
+</div>
+<div id="lsaved" class="hidden" style="text-align:center;margin-bottom:12px">
+<div style="font-size:15px;color:#cbd5e1">🔒 Cuenta guardada</div>
+<div style="font-size:22px;letter-spacing:4px;margin:6px 0">••••••••</div>
+<button class="gray sm" onclick="otraCuenta()">Usar otra cuenta</button>
+</div>
+<label class="msg" style="display:flex;align-items:center;gap:8px;margin:0 0 12px"><input id="lrem" type="checkbox" checked style="width:auto;margin:0"> Recordar mi usuario y contraseña en este teléfono</label>
 <button onclick="login()">Entrar</button>
 <button class="gray" style="margin-top:10px" onclick="enterClient()">🛍️ Ver tienda (clientes)</button>
 <div id="err"></div>
@@ -380,7 +387,7 @@ aside h2{width:100%;margin:0}
 <button class="green" onclick="saveProfile()">Guardar perfil</button>
 </div>
 <p class="msg" id="pshow" style="margin-top:10px"></p>
-<label class="msg" style="display:flex;align-items:center;gap:8px;margin-top:12px"><input id="prem" type="checkbox" style="width:auto;margin:0" onchange="togSesion()"> Recordar mi sesión en este teléfono (no pedir usuario y contraseña al entrar)</label>
+<label class="msg" style="display:flex;align-items:center;gap:8px;margin-top:12px"><input id="prem" type="checkbox" style="width:auto;margin:0" onchange="togSesion()"> Recordar mi usuario y contraseña en este teléfono (en la pantalla de entrada solo toco «Entrar»)</label>
 </div>
 </div>
 
@@ -687,22 +694,43 @@ function isAdmin(){ return me && me.role === "admin"; }
 function login(){
   var u = $("lu").value.trim().toLowerCase(), p = $("lp").value;
   var f = db.users.find(function(x){ return x.user.toLowerCase() === u && x.pass === p; });
-  if (!f) { $("err").textContent = "Usuario o contraseña incorrectos"; return; }
-  if ($("lrem").checked) saveSesion(f); else clearSesion();
+  if (!f) {
+    if (cloudDoc && !cloudReady) { $("err").textContent = "Conectando con la nube… intenta de nuevo en unos segundos."; return; }
+    $("err").textContent = "Usuario o contraseña incorrectos";
+    if (!$("lsaved").classList.contains("hidden")) {
+      var old = credGet(); clearCred(); otraCuenta();
+      if (old) $("lu").value = old.u;
+      $("err").textContent = "La contraseña guardada ya no es válida. Escríbela de nuevo.";
+    }
+    return;
+  }
+  if ($("lrem").checked) saveCred(f.user, f.pass); else clearCred();
   enterApp(f);
 }
-var SES_KEY = "moviles_sesion_v1";
-function hashS(t){ var h = 5381; for (var i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return String(h >>> 0); }
-function sesKey(u){ return hashS(u.user + "|" + u.pass + "|sesion"); }
-function saveSesion(u){ try { localStorage.setItem(SES_KEY, JSON.stringify({ u: u.user, k: sesKey(u) })); } catch(e) {} }
-function clearSesion(){ try { localStorage.removeItem(SES_KEY); } catch(e) {} }
-function autoLogin(){
+var CRED_KEY = "moviles_cred_v1";
+function enc(t){ try { return btoa(unescape(encodeURIComponent(t))); } catch(e) { return ""; } }
+function dec(t){ try { return decodeURIComponent(escape(atob(t))); } catch(e) { return ""; } }
+function saveCred(u, p){ try { localStorage.setItem(CRED_KEY, JSON.stringify({ u: enc(u), p: enc(p) })); } catch(e) {} }
+function clearCred(){ try { localStorage.removeItem(CRED_KEY); } catch(e) {} }
+function credGet(){
   try {
-    var ss = JSON.parse(localStorage.getItem(SES_KEY) || "null");
-    if (!ss) return;
-    var u = db.users.find(function(x){ return x.user === ss.u; });
-    if (u && sesKey(u) === ss.k) enterApp(u); else clearSesion();
-  } catch(e) {}
+    var c = JSON.parse(localStorage.getItem(CRED_KEY) || "null");
+    if (!c) return null;
+    var u = dec(c.u), p = dec(c.p);
+    return u && p ? { u: u, p: p } : null;
+  } catch(e) { return null; }
+}
+function initLoginSaved(){
+  var c = credGet();
+  $("lrem").checked = true;
+  if (!c) { $("lfields").classList.remove("hidden"); $("lsaved").classList.add("hidden"); return; }
+  $("lu").value = c.u; $("lp").value = c.p;
+  $("lfields").classList.add("hidden"); $("lsaved").classList.remove("hidden");
+}
+function otraCuenta(){
+  $("lu").value = ""; $("lp").value = "";
+  $("lfields").classList.remove("hidden"); $("lsaved").classList.add("hidden");
+  $("lu").focus();
 }
 function enterClient(){ enterApp({ user: "cliente", role: "cliente" }); }
 function enterApp(f){
@@ -714,10 +742,10 @@ function enterApp(f){
   show(f.role === "cliente" ? "client" : "screens");
 }
 function logout(){
-  clearSesion();
   me = null; updateTopbar();
   $("app").classList.add("hidden"); $("login").classList.remove("hidden");
   $("lu").value = ""; $("lp").value = "";
+  initLoginSaved();
   document.body.classList.remove("tech"); document.body.classList.remove("cli");
 }
 ["lu","lp"].forEach(function(id){
@@ -1576,13 +1604,13 @@ function updateWho(){
 function renderProfile(){
   $("pname").value = (me && me.nombre) || "";
   $("pshow").textContent = "Así saldrá en tu mensaje: " + nombreDe(me);
-  var rec = false; try { rec = !!localStorage.getItem(SES_KEY); } catch(e) {}
+  var rec = false; try { rec = !!credGet(); } catch(e) {}
   $("prem").checked = rec;
 }
 function togSesion(){
   if (!me || me.role === "cliente") return;
-  if ($("prem").checked) { saveSesion(me); toast("✅ Sesión recordada en este teléfono"); }
-  else { clearSesion(); toast("Ya no se recordará tu sesión: la próxima vez pedirá usuario y contraseña"); }
+  if ($("prem").checked) { saveCred(me.user, me.pass); toast("✅ Usuario y contraseña guardados en este teléfono"); }
+  else { clearCred(); toast("Ya no se recordarán: la próxima vez pedirá usuario y contraseña"); }
 }
 function saveProfile(){
   if (!me) return;
@@ -2001,10 +2029,11 @@ function changePass(){
   var p = $("cpass").value;
   if (p.length < 4) return alert("Mínimo 4 caracteres.");
   me.pass = p; saveDB(); $("cpass").value = "";
+  var cg = credGet(); if (cg && cg.u === me.user) saveCred(me.user, p);
   alert("Contraseña actualizada.");
 }
 
-autoLogin();
+initLoginSaved();
 </script>
 </body>
 </html>
