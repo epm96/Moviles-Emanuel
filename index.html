@@ -86,6 +86,38 @@ aside h2{width:100%;margin:0}
 .nav{width:auto}
 .who{margin:0;width:100%}
 }
+/* ---------- TIENDA PARA CLIENTES ---------- */
+.hero{background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:20px;padding:22px;margin:12px 0 14px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.hl{font-size:26px;font-weight:800}
+.hs{color:#dbe4ff;font-size:14px;margin-top:4px}
+.hcta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.htel{font-weight:700;margin-right:4px}
+.cta{display:inline-block;padding:10px 16px;border-radius:12px;background:#1d4ed8;color:#fff;font-weight:600;text-decoration:none;font-size:14px}
+.cta.wa{background:#16a34a}
+.cta.ghost{background:#ffffff26}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
+.tabb{width:auto;flex:none;white-space:nowrap;background:#111a2e;border:1px solid #2a3550;color:#cbd5e1;border-radius:999px;padding:9px 16px;font-size:14px}
+.tabb.on{background:#fff;color:#0b1220;border-color:#fff}
+.csearch{margin-bottom:14px}
+.brand{margin-bottom:18px}
+.brand h4{margin:0 0 8px;font-size:14px;color:#93c5fd;text-transform:uppercase;letter-spacing:.06em}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.mod{background:#111a2e;border:1px solid #1e293b;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.shop2{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.pc2{background:#111a2e;border:1px solid #1e293b;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+.pc2:hover{transform:translateY(-3px);border-color:#3b82f6}
+.pc2.off{opacity:.6}
+.pc2 img,.pc2 .ph{width:100%;height:170px;object-fit:cover;display:block}
+.pc2 img{cursor:zoom-in}
+.in2{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pdesc{color:#94a3b8;font-size:13px}
+.price{font-size:20px;font-weight:800;color:#fbbf24}
+.price.ask{font-size:14px;color:#94a3b8;font-weight:600}
+.acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}
+.acts .cta{flex:1;text-align:center;padding:8px 6px;font-size:13px}
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{display:inline-flex;align-items:center;gap:4px;background:#0b1220;border:1px solid #2a3550;border-radius:999px;padding:4px 6px 4px 12px}
+.chip button{width:auto;padding:3px 8px;margin:0;font-size:12px}
 </style>
 </head>
 <body>
@@ -98,7 +130,7 @@ aside h2{width:100%;margin:0}
 <input id="lu" placeholder="Usuario" autocomplete="username">
 <input id="lp" type="password" placeholder="Contraseña" autocomplete="current-password">
 <button onclick="login()">Entrar</button>
-<button class="gray" style="margin-top:10px" onclick="enterClient()">👀 Ver inventario (clientes)</button>
+<button class="gray" style="margin-top:10px" onclick="enterClient()">🛍️ Ver tienda (clientes)</button>
 <div id="err"></div>
 </div>
 </section>
@@ -109,14 +141,14 @@ aside h2{width:100%;margin:0}
 <div id="app" class="hidden">
 <aside>
 <h2>📱 Móviles Emanuel</h2>
-<button class="nav cliOnly on" id="n-client" onclick="show('client')">📟 Inventario</button>
+<button class="nav cliOnly on" id="n-client" onclick="show('client')">🛍️ Tienda</button>
 <button class="nav noCli on" id="n-screens" onclick="show('screens')">📟 Pantallas</button>
 <button class="nav noCli" id="n-report" onclick="show('report')">📝 Reporte diario</button>
 <button class="nav noCli" id="n-history" onclick="show('history')">📅 Historial</button>
 <button class="nav noCli" id="n-profile" onclick="show('profile')">👤 Mi perfil</button>
 <button class="nav adminOnly" id="n-pay" onclick="show('pay')">💵 Pagos técnico</button>
 <button class="nav noCli" id="n-notes" onclick="show('notes')">🗒️ Notas</button>
-<button class="nav adminOnly" id="n-acc" onclick="show('acc')">🛍️ Catálogo clientes</button>
+<button class="nav adminOnly" id="n-acc" onclick="show('acc')">🛍️ Tienda clientes</button>
 <button class="nav adminOnly" id="n-users" onclick="show('users')">👥 Usuarios</button>
 <button class="nav adminOnly" id="n-backup" onclick="show('backup')">💾 Respaldo</button>
 <button class="gray" onclick="logout()">Cerrar sesión</button>
@@ -125,39 +157,68 @@ aside h2{width:100%;margin:0}
 
 <main>
 <div id="v-client" class="hidden">
-<h3>📟 Pantallas disponibles</h3>
-<button class="gray sm adminOnly" onclick="show('acc')">← Volver</button>
-<div class="card">
-<input id="cq" placeholder="🔍 Buscar marca o modelo..." oninput="renderClient()">
-<div class="scroll" style="margin-top:10px">
-<table style="min-width:0"><thead><tr><th>Marca</th><th>Modelo</th><th>Estado</th></tr></thead><tbody id="cltb"></tbody></table>
+<button class="gray sm adminOnly" onclick="show('acc')">← Volver a administrar</button>
+<div class="hero">
+<div><div class="hl">📱 Móviles Emanuel</div><div class="hs">Taller de celulares · Pantallas, accesorios y teléfonos</div></div>
+<div class="hcta" id="hcta"></div>
 </div>
-<p class="msg hidden" id="clempty">No hay pantallas que mostrar.</p>
-</div>
-<div class="card"><b>🛍️ Micas, covers y cables</b><div id="calist" style="margin-top:10px"></div></div>
+<div class="tabs" id="ctabs"></div>
+<input id="cq" class="csearch" placeholder="🔍 Buscar..." oninput="renderClient()">
+<div id="csec"></div>
 </div>
 
 <div id="v-acc" class="hidden">
-<h3>Catálogo para clientes</h3>
+<h3>🛍️ Tienda para clientes</h3>
+<div class="row" style="margin-bottom:14px"><button onclick="show('client')">👀 Ver como cliente</button></div>
+
 <div class="card">
-<b>Micas y covers</b>
-<p class="msg">Agrega micas, covers y cables con foto y precio (opcionales) y márcalos como disponibles o no. Los clientes ven una vitrina con foto y el estado, sin cantidades.</p>
+<b>📞 Contacto de la tienda</b>
+<p class="msg">Este número sale en la vista de clientes con botones de llamar y WhatsApp. Los clientes pueden preguntar el precio desde cada artículo.</p>
 <div class="grid" style="margin-top:10px">
-<select id="atipo"><option>Mica</option><option>Cover</option><option>Cable</option><option>Otro</option></select>
-<input id="anombre" placeholder="Nombre o modelo (ej. Mica iPhone 13)">
-<input id="aprecio" type="number" min="0" step="0.01" placeholder="Precio (opcional)">
-<select id="adisp"><option value="1">Disponible</option><option value="0">No disponible</option></select>
-<input id="afoto" type="file" accept="image/*">
-<button class="green" onclick="addAcc()">Agregar</button>
+<input id="atel" type="tel" placeholder="Teléfono / WhatsApp (ej. 5XXXXXXX)">
+<button class="green" onclick="saveTel()">Guardar teléfono</button>
 </div>
+</div>
+
+<div class="card">
+<b>🗂️ Secciones de la tienda</b>
+<p class="msg">Crea tus propias secciones (Micas, Covers, Teléfonos de uso, Fundas, Cargadores, Audífonos…). Cada sección aparece como una pestaña en la vista de clientes cuando tiene artículos.</p>
+<div class="cats" id="catlist"></div>
+<div class="grid">
+<input id="cemoji" placeholder="Emoji (ej. 🎧)" maxlength="4">
+<input id="cnombre" placeholder="Nombre de la sección">
+<button onclick="addCat()">➕ Crear sección</button>
+</div>
+</div>
+
+<div class="card">
+<b id="at">Agregar artículo</b>
+<input type="hidden" id="aid">
+<div class="grid" style="margin-top:10px">
+<select id="atipo"></select>
+<input id="anombre" placeholder="Nombre o modelo (ej. Mica iPhone 13)">
+<input id="aprecio" type="number" min="0" step="0.01" placeholder="Precio en CUP (opcional)">
+<select id="adisp"><option value="1">Disponible</option><option value="0">No disponible</option></select>
+<input id="adesc" placeholder="Detalles (ej. 128GB, batería 90%, con cargador)">
+<input id="afoto" type="file" accept="image/*">
+</div>
+<div class="row" style="margin-top:10px">
+<button class="green" onclick="saveAcc()">Guardar artículo</button>
+<button class="gray" onclick="clearAccForm()">Cancelar</button>
+</div>
+</div>
+
+<div class="card">
+<b>Mis artículos</b>
 <div id="acclist" style="margin-top:10px"></div>
 </div>
+
 <div class="card">
 <b>Compartir con clientes</b>
-<p class="msg">En esta app los datos se guardan solo en tu navegador, por eso un cliente no los vería desde su teléfono. Exporta la página para clientes (muestra pantallas y accesorios, sin cantidades ni precios), súbela a un hosting gratis (por ejemplo Netlify Drop o GitHub Pages) y comparte el link. Cuando cambie tu inventario, vuelve a exportarla y subirla.</p>
+<p class="msg">Tus clientes entran a la app con el botón «Ver tienda (clientes)» de la pantalla de inicio, y todo se actualiza solo desde la nube. Si además quieres una página suelta para subir a un hosting, puedes exportarla aquí (se queda con los datos del momento de exportar).</p>
 <div class="row">
 <button onclick="show('client')">👀 Ver como cliente</button>
-<button class="green" onclick="exportCatalogo()">⬇️ Exportar página para clientes</button>
+<button class="gray" onclick="exportCatalogo()">⬇️ Exportar página para clientes</button>
 </div>
 </div>
 </div>
@@ -342,7 +403,7 @@ aside h2{width:100%;margin:0}
 <option value="hist_user">📅 Historial de un usuario (técnico o admin)</option>
 <option value="hist_all">📅 Historial de TODOS</option>
 <option value="notes">🗒️ Todas las notas</option>
-<option value="acc">🛍️ Micas y covers del catálogo</option>
+<option value="acc">🛍️ Artículos de la tienda (micas, covers, teléfonos…)</option>
 <option value="pay">💵 Pagos configurados (volver a 0)</option>
 </select>
 <select id="duser" class="hidden" onchange="delUI()"></select>
@@ -407,6 +468,11 @@ function loadDB(){
 function ensureCfg(){
   if (!db.cfg || typeof db.cfg !== "object" || Array.isArray(db.cfg)) db.cfg = { metaTec: 5000, metaDia: 0, metaMes: 0 };
   if (!Array.isArray(db.accesorios)) db.accesorios = [];
+  if (!Array.isArray(db.cfg.cats)) db.cfg.cats = [
+    { n: "Mica", i: "🛡️" }, { n: "Cover", i: "📱" }, { n: "Cable", i: "🔌" },
+    { n: "Teléfonos de uso", i: "📲" }, { n: "Otro", i: "🛍️" }
+  ];
+  if (typeof db.cfg.tel !== "string") db.cfg.tel = "";
   if (!db.inv || typeof db.inv !== "object" || Array.isArray(db.inv))
     db.inv = { "Rep. base de carga tipo C": 200, "Cambio de base de carga": 200 };
 }
@@ -770,58 +836,200 @@ function fotoEl(a, small){
 /* ---------- CATÁLOGO PARA CLIENTES ---------- */
 function estadoTxt(ok){ return ok ? "✅ Disponible" : "⛔ No disponible en el momento"; }
 function sortAcc(){ return db.accesorios.slice().sort(function(a, b){ return (a.tipo + a.nombre).localeCompare(b.tipo + b.nombre); }); }
+function catList(){
+  var out = (db.cfg && Array.isArray(db.cfg.cats) ? db.cfg.cats : []).slice(), seen = {};
+  out.forEach(function(c){ seen[c.n] = 1; });
+  db.accesorios.forEach(function(a){ if (a.tipo && !seen[a.tipo]) { seen[a.tipo] = 1; out.push({ n: a.tipo, i: "🛍️" }); } });
+  return out;
+}
+function telDigits(){
+  var d = String(db.cfg.tel || "").replace(/\D/g, "");
+  if (d.length === 8 && d.charAt(0) === "5") d = "53" + d;
+  return d;
+}
+function waLink(texto){ var d = telDigits(); return d ? "https://wa.me/" + d + (texto ? "?text=" + encodeURIComponent(texto) : "") : ""; }
+function telLink(){ return "tel:" + String(db.cfg.tel || "").replace(/[^\d+]/g, ""); }
+function cta(href, txt, cls){
+  var a = document.createElement("a"); a.href = href; a.textContent = txt; a.className = "cta " + (cls || "");
+  if (/^http/.test(href)) { a.target = "_blank"; a.rel = "noopener"; }
+  return a;
+}
+function mk(tag, cls, txt){
+  var e = document.createElement(tag); if (cls) e.className = cls; if (txt !== undefined) e.textContent = txt; return e;
+}
+
+var cliTab = "screens";
 function renderClient(){
+  var tabs = [{ k: "screens", n: "Pantallas", i: "📟", c: db.screens.length }];
+  catList().forEach(function(c){
+    var n = db.accesorios.filter(function(a){ return a.tipo === c.n; }).length;
+    if (n) tabs.push({ k: "c:" + c.n, n: c.n, i: c.i || "🛍️", c: n });
+  });
+  if (!tabs.some(function(t){ return t.k === cliTab; })) cliTab = tabs[0].k;
+  var cur = tabs.filter(function(t){ return t.k === cliTab; })[0];
+
+  var h = $("hcta"); h.innerHTML = "";
+  if (db.cfg.tel) {
+    h.appendChild(mk("span", "htel", "📞 " + db.cfg.tel));
+    h.appendChild(cta(telLink(), "Llamar", "ghost"));
+    var w = waLink("Hola, quiero consultar un precio."); if (w) h.appendChild(cta(w, "💬 WhatsApp", "wa"));
+  }
+
+  var tb = $("ctabs"); tb.innerHTML = "";
+  tabs.forEach(function(t){
+    var b = mk("button", "tabb" + (t.k === cliTab ? " on" : ""), t.i + " " + t.n + " (" + t.c + ")");
+    b.onclick = function(){ cliTab = t.k; $("cq").value = ""; renderClient(); };
+    tb.appendChild(b);
+  });
+
+  $("cq").placeholder = "🔍 Buscar en " + cur.n + "...";
   var q = $("cq").value.trim().toLowerCase();
-  var tb = $("cltb"); tb.innerHTML = "";
+  var box = $("csec"); box.innerHTML = "";
+  if (cliTab === "screens") renderCliScreens(box, q); else renderCliItems(box, cliTab.slice(2), q);
+}
+function renderCliScreens(box, q){
   var list = db.screens.filter(function(s){ return !q || (s.marca + " " + s.modelo).toLowerCase().indexOf(q) !== -1; })
     .sort(function(a, b){ return (a.marca + a.modelo).localeCompare(b.marca + b.modelo); });
-  list.forEach(function(s){
-    var tr = document.createElement("tr");
-    tr.appendChild(cell(s.marca)); tr.appendChild(cell(s.modelo));
-    tr.appendChild(s.cant > 0 ? cell("✅ Disponible", "ok") : cell("⛔ No disponible en el momento", "zero"));
-    tb.appendChild(tr);
-  });
-  $("clempty").classList.toggle("hidden", list.length > 0);
-  var box = $("calist"); box.innerHTML = ""; box.className = "";
-  if (!db.accesorios.length) { box.innerHTML = '<p class="msg">Pregunta por micas, covers y cables en el taller.</p>'; return; }
-  box.className = "shop";
-  sortAcc().forEach(function(a){
-    var c = document.createElement("div"); c.className = "pc";
-    c.appendChild(fotoEl(a, false));
-    var inn = document.createElement("div"); inn.className = "in";
-    var t = document.createElement("span"); t.className = "tag"; t.style.alignSelf = "flex-start"; t.textContent = a.tipo;
-    var n = document.createElement("b"); n.textContent = a.nombre;
-    inn.appendChild(t); inn.appendChild(n);
-    if (a.precio > 0) { var pr = document.createElement("div"); pr.className = "pr"; pr.textContent = a.precio + " CUP"; inn.appendChild(pr); }
-    var st = document.createElement("span"); st.className = a.disp ? "ok" : "zero"; st.textContent = estadoTxt(a.disp);
-    inn.appendChild(st); c.appendChild(inn); box.appendChild(c);
+  if (!list.length) { box.appendChild(mk("p", "msg", "No hay pantallas que mostrar.")); return; }
+  var by = {};
+  list.forEach(function(s){ (by[s.marca] = by[s.marca] || []).push(s); });
+  Object.keys(by).sort(function(a, b){ return a.localeCompare(b); }).forEach(function(m){
+    var sec = mk("div", "brand"); sec.appendChild(mk("h4", "", m));
+    var g = mk("div", "mods");
+    by[m].forEach(function(s){
+      var d = mk("div", "mod"); d.appendChild(mk("b", "", s.modelo));
+      d.appendChild(mk("span", s.cant > 0 ? "ok" : "zero", s.cant > 0 ? "✅ Disponible" : "⛔ No disponible en el momento"));
+      g.appendChild(d);
+    });
+    sec.appendChild(g); box.appendChild(sec);
   });
 }
+function renderCliItems(box, cat, q){
+  var list = db.accesorios.filter(function(a){
+    return a.tipo === cat && (!q || (a.nombre + " " + (a.desc || "")).toLowerCase().indexOf(q) !== -1);
+  }).sort(function(a, b){ return (b.disp ? 1 : 0) - (a.disp ? 1 : 0) || a.nombre.localeCompare(b.nombre); });
+  if (!list.length) { box.appendChild(mk("p", "msg", "No hay resultados.")); return; }
+  var g = mk("div", "shop2");
+  list.forEach(function(a){
+    var c = mk("div", "pc2" + (a.disp ? "" : " off"));
+    c.appendChild(fotoEl(a, false));
+    var inn = mk("div", "in2");
+    inn.appendChild(mk("b", "", a.nombre));
+    if (a.desc) inn.appendChild(mk("div", "pdesc", a.desc));
+    inn.appendChild(a.precio > 0 ? mk("div", "price", a.precio + " CUP") : mk("div", "price ask", "Consulta el precio"));
+    inn.appendChild(mk("span", a.disp ? "ok" : "zero", estadoTxt(a.disp)));
+    if (db.cfg.tel) {
+      var acts = mk("div", "acts");
+      var w = waLink("Hola, me interesa: " + a.nombre + (a.precio > 0 ? " (" + a.precio + " CUP)" : "") + ". ¿Sigue disponible?");
+      if (w) acts.appendChild(cta(w, "💬 Preguntar", "wa"));
+      acts.appendChild(cta(telLink(), "📞 Llamar", "ghost"));
+      inn.appendChild(acts);
+    }
+    c.appendChild(inn); g.appendChild(c);
+  });
+  box.appendChild(g);
+}
+
+/* ---------- ADMIN: TIENDA ---------- */
+function saveTel(){
+  if (!isAdmin()) return;
+  db.cfg.tel = $("atel").value.trim(); saveDB(); alert("Teléfono guardado.");
+}
+function renderCats(){
+  var box = $("catlist"); box.innerHTML = "";
+  var cs = catList();
+  if (!cs.length) { box.appendChild(mk("p", "msg", "Aún no tienes secciones. Crea la primera abajo.")); return; }
+  cs.forEach(function(c){
+    var n = db.accesorios.filter(function(a){ return a.tipo === c.n; }).length;
+    var ch = mk("span", "chip", (c.i || "🛍️") + " " + c.n + " · " + n + " ");
+    ch.appendChild(btn("✏️", "gray", function(){ renameCat(c); }));
+    ch.appendChild(btn("✕", "red", function(){ delCat(c); }));
+    box.appendChild(ch);
+  });
+}
+function addCat(){
+  if (!isAdmin()) return;
+  var n = $("cnombre").value.trim(), i = $("cemoji").value.trim() || "🛍️";
+  if (!n) return alert("Escribe el nombre de la sección.");
+  if (catList().some(function(c){ return c.n.toLowerCase() === n.toLowerCase(); })) return alert("Esa sección ya existe.");
+  db.cfg.cats = (db.cfg.cats || []).concat([{ n: n, i: i }]);
+  saveDB(); $("cnombre").value = ""; $("cemoji").value = ""; renderAcc();
+}
+function renameCat(c){
+  if (!isAdmin()) return;
+  var nn = prompt("Nombre de la sección:", c.n); if (nn === null) return; nn = nn.trim();
+  if (!nn) return;
+  var ic = prompt("Emoji de la sección:", c.i || "🛍️"); if (ic === null) ic = c.i;
+  if (nn !== c.n && catList().some(function(x){ return x.n.toLowerCase() === nn.toLowerCase(); })) return alert("Ya existe una sección con ese nombre.");
+  var old = c.n;
+  var inCfg = (db.cfg.cats || []).filter(function(x){ return x.n === old; })[0];
+  if (inCfg) { inCfg.n = nn; inCfg.i = ic.trim() || "🛍️"; }
+  else db.cfg.cats = (db.cfg.cats || []).concat([{ n: nn, i: ic.trim() || "🛍️" }]);
+  db.accesorios.forEach(function(a){ if (a.tipo === old) a.tipo = nn; });
+  saveDB(); renderAcc();
+}
+function delCat(c){
+  if (!isAdmin()) return;
+  var n = db.accesorios.filter(function(a){ return a.tipo === c.n; }).length;
+  if (n) return alert("La sección «" + c.n + "» tiene " + n + " artículo(s). Bórralos o muévelos a otra sección primero.");
+  if (!confirm("¿Borrar la sección «" + c.n + "»?")) return;
+  db.cfg.cats = (db.cfg.cats || []).filter(function(x){ return x.n !== c.n; });
+  saveDB(); renderAcc();
+}
+function fillCatSelect(){
+  var s = $("atipo"), prev = s.value; s.innerHTML = "";
+  catList().forEach(function(c){
+    var o = document.createElement("option"); o.value = c.n; o.textContent = (c.i || "🛍️") + " " + c.n; s.appendChild(o);
+  });
+  if (prev) s.value = prev;
+}
+function clearAccForm(){
+  ["aid","anombre","aprecio","adesc","afoto"].forEach(function(x){ $(x).value = ""; });
+  $("adisp").value = "1"; $("at").textContent = "Agregar artículo";
+}
+function editAcc(a){
+  if (!isAdmin()) return;
+  fillCatSelect();
+  $("aid").value = a.id; $("atipo").value = a.tipo; $("anombre").value = a.nombre;
+  $("aprecio").value = a.precio > 0 ? a.precio : ""; $("adisp").value = a.disp ? "1" : "0";
+  $("adesc").value = a.desc || ""; $("afoto").value = "";
+  $("at").textContent = "Editar artículo";
+  $("at").scrollIntoView({ behavior: "smooth", block: "center" });
+}
 function renderAcc(){
+  if (!isAdmin()) return;
+  if (document.activeElement !== $("atel")) $("atel").value = db.cfg.tel || "";
+  renderCats(); fillCatSelect();
   var box = $("acclist"); box.innerHTML = "";
-  if (!db.accesorios.length) { box.innerHTML = '<p class="msg">Aún no has agregado micas, covers ni cables.</p>'; return; }
-  sortAcc().forEach(function(a){
-    var d = document.createElement("div"); d.className = "item";
-    d.appendChild(fotoEl(a, true));
-    var tx = document.createElement("div"); tx.className = "tx";
-    var t = document.createElement("span"); t.className = "tag"; t.textContent = a.tipo;
-    var l = document.createElement("span"); l.textContent = " " + a.nombre;
-    var sm = document.createElement("small"); sm.textContent = (a.precio > 0 ? a.precio + " CUP · " : "") + estadoTxt(a.disp);
-    tx.appendChild(t); tx.appendChild(l); tx.appendChild(sm); d.appendChild(tx);
-    d.appendChild(btn(a.disp ? "Marcar no disponible" : "Marcar disponible", "gray", function(){
-      a.disp = !a.disp; saveDB(); renderAcc();
-    }));
-    d.appendChild(btn(a.foto ? "📷 Cambiar foto" : "📷 Subir foto", "", function(){ changeFoto(a); }));
-    if (a.foto) d.appendChild(btn("Quitar foto", "gray", function(){
-      delFoto(a.foto); delete a.foto; saveDB(); renderAcc();
-    }));
-    d.appendChild(btn("Borrar", "red", function(){
-      if (!confirm("¿Borrar este artículo?")) return;
-      if (a.foto) delFoto(a.foto);
-      db.accesorios = db.accesorios.filter(function(x){ return x.id !== a.id; });
-      saveDB(); renderAcc();
-    }));
-    box.appendChild(d);
+  if (!db.accesorios.length) { box.innerHTML = '<p class="msg">Aún no has agregado artículos.</p>'; return; }
+  catList().forEach(function(c){
+    var items = db.accesorios.filter(function(a){ return a.tipo === c.n; })
+      .sort(function(a, b){ return a.nombre.localeCompare(b.nombre); });
+    if (!items.length) return;
+    var sec = mk("div", "brand"); sec.appendChild(mk("h4", "", (c.i || "🛍️") + " " + c.n + " (" + items.length + ")"));
+    items.forEach(function(a){
+      var d = mk("div", "item");
+      d.appendChild(fotoEl(a, true));
+      var tx = mk("div", "tx"); tx.appendChild(mk("span", "", a.nombre));
+      tx.appendChild(mk("small", "", (a.precio > 0 ? a.precio + " CUP · " : "") + estadoTxt(a.disp) + (a.desc ? " · " + a.desc : "")));
+      d.appendChild(tx);
+      d.appendChild(btn("✏️ Editar", "", function(){ editAcc(a); }));
+      d.appendChild(btn(a.disp ? "Marcar no disponible" : "Marcar disponible", "gray", function(){
+        a.disp = !a.disp; saveDB(); renderAcc();
+      }));
+      d.appendChild(btn(a.foto ? "📷 Cambiar foto" : "📷 Subir foto", "", function(){ changeFoto(a); }));
+      if (a.foto) d.appendChild(btn("Quitar foto", "gray", function(){
+        delFoto(a.foto); delete a.foto; saveDB(); renderAcc();
+      }));
+      d.appendChild(btn("Borrar", "red", function(){
+        if (!confirm("¿Borrar este artículo?")) return;
+        if (a.foto) delFoto(a.foto);
+        db.accesorios = db.accesorios.filter(function(x){ return x.id !== a.id; });
+        saveDB(); renderAcc();
+      }));
+      sec.appendChild(d);
+    });
+    box.appendChild(sec);
   });
 }
 function changeFoto(a){
@@ -836,71 +1044,106 @@ function changeFoto(a){
   };
   inp.click();
 }
-function addAcc(){
+function saveAcc(){
   if (!isAdmin()) return;
   var n = $("anombre").value.trim();
   if (!n) return alert("Escribe el nombre o modelo.");
-  var item = { id: String(Date.now()), tipo: $("atipo").value, nombre: n, disp: $("adisp").value === "1", precio: Number($("aprecio").value) || 0 };
+  if (!$("atipo").value) return alert("Primero crea una sección.");
+  var id = $("aid").value;
+  var it = id ? db.accesorios.filter(function(x){ return x.id === id; })[0] : null;
+  var isNew = !it; if (isNew) it = { id: String(Date.now()) };
+  it.tipo = $("atipo").value; it.nombre = n; it.disp = $("adisp").value === "1";
+  it.precio = Number($("aprecio").value) || 0; it.desc = $("adesc").value.trim();
   var f = $("afoto").files[0];
   var done = function(){
-    db.accesorios.push(item); saveDB();
-    $("anombre").value = ""; $("aprecio").value = ""; $("afoto").value = ""; renderAcc();
+    if (isNew) db.accesorios.push(it);
+    saveDB(); clearAccForm(); renderAcc();
   };
   if (!f) return done();
-  pickFoto(f, function(data){ var fid = item.id + "p"; putFoto(fid, data); item.foto = fid; done(); });
+  pickFoto(f, function(data){
+    var old = it.foto, fid = String(Date.now()) + "p";
+    putFoto(fid, data); it.foto = fid; if (old) delFoto(old);
+    done();
+  });
 }
-var CAT_TPL = [
-  "<!DOCTYPE html>",
-  "<html lang=\"es\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
-  "<title>Móviles Emanuel · Disponibilidad<\/title>",
-  "<style>",
-  "*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#0b1220;color:#e5e9f2}",
-  ".wrap{max-width:720px;margin:0 auto;padding:20px}h1{margin:0 0 4px;font-size:26px}h2{margin:26px 0 10px;font-size:20px}",
-  ".sub{color:#94a3b8;font-size:14px;margin:0 0 14px}",
-  "input{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #2a3550;background:#111a2e;color:#e5e9f2;width:100%;margin-bottom:12px}",
-  ".it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:#111a2e;border:1px solid #1e293b;border-radius:12px;margin-bottom:8px}",
-  ".ok{color:#4ade80;font-weight:700}.no{color:#f87171;font-weight:700}",
-  ".shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}",
-  ".pc{background:#111a2e;border:1px solid #1e293b;border-radius:14px;overflow:hidden}",
-  ".pc img,.ph{width:100%;height:130px;object-fit:cover;display:block}.pc img{cursor:zoom-in}",
-  ".ph{background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:34px}",
-  ".in{padding:10px;display:flex;flex-direction:column;gap:4px}",
-  ".tag{background:#1d4ed8;border-radius:8px;padding:2px 8px;font-size:12px;align-self:flex-start}",
-  ".pr{color:#fbbf24;font-weight:700}",
-  "#zoom{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}",
-  "#zoom img{max-width:100%;max-height:100%;border-radius:12px}",
-  "<\/style><\/head><body><div class=\"wrap\">",
-  "<h1>📱 Móviles Emanuel<\/h1>",
-  "<p class=\"sub\">Pantallas disponibles · Actualizado: __FECHA__<\/p>",
-  "<input id=\"q\" placeholder=\"🔍 Buscar marca o modelo...\">",
-  "<div id=\"list\"><\/div>",
-  "<h2>🛍️ Micas, covers y cables<\/h2>",
-  "<div id=\"acc\"><\/div>",
-  "<\/div>",
-  "<div id=\"zoom\" onclick=\"this.style.display='none'\"><img id=\"zi\" alt=\"\"><\/div>",
-  "<script>",
-  "var D = __DATA__;",
-  "function $(i){ return document.getElementById(i); }",
-  "function esc(t){ var d = document.createElement(\"div\"); d.textContent = t; return d.innerHTML; }",
-  "function est(ok){ return '<span class=\"' + (ok ? 'ok' : 'no') + '\">' + (ok ? '✅ Disponible' : '⛔ No disponible en el momento') + '<\/span>'; }",
-  "function row(a, b, ok){ return '<div class=\"it\"><div><b>' + esc(a) + '<\/b> ' + esc(b) + '<\/div>' + est(ok) + '<\/div>'; }",
-  "function render(){",
-  "  var q = $(\"q\").value.trim().toLowerCase();",
-  "  var s = D.s.filter(function(x){ return !q || (x[0] + \" \" + x[1]).toLowerCase().indexOf(q) !== -1; })",
-  "    .sort(function(a, b){ return (a[0] + a[1]).localeCompare(b[0] + b[1]); });",
-  "  $(\"list\").innerHTML = s.length ? s.map(function(x){ return row(x[0], x[1], x[2]); }).join(\"\") : '<p class=\"sub\">No hay resultados.<\/p>';",
-  "}",
-  "$(\"q\").oninput = render; render();",
-  "function card(x){",
-  "  return '<div class=\"pc\">' + (x[4] ? '<img src=\"' + x[4] + '\" alt=\"\" onclick=\"$(\\'zi\\').src=this.src;$(\\'zoom\\').style.display=\\'flex\\'\">' : '<div class=\"ph\">🛍️<\/div>') +",
-  "    '<div class=\"in\"><span class=\"tag\">' + esc(x[0]) + '<\/span><b>' + esc(x[1]) + '<\/b>' +",
-  "    (x[3] > 0 ? '<div class=\"pr\">' + x[3] + ' CUP<\/div>' : '') + est(x[2]) + '<\/div><\/div>';",
-  "}",
-  "var A = D.a.slice().sort(function(a, b){ return (a[0] + a[1]).localeCompare(b[0] + b[1]); });",
-  "if (A.length) { $(\"acc\").className = \"shop\"; $(\"acc\").innerHTML = A.map(card).join(\"\"); }",
-  "else $(\"acc\").innerHTML = '<p class=\"sub\">Pregunta por micas, covers y cables en el taller.<\/p>';",
-  "<\/script><\/body><\/html>"
-].join("\n");
+
+/* ---------- PÁGINA EXPORTADA PARA CLIENTES (opcional) ---------- */
+var CAT_TPL = `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Móviles Emanuel · Tienda<\/title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#0b1220;color:#e5e9f2}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.hero{background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:20px;padding:20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:24px}.sub{color:#dbe4ff;font-size:13px;margin:4px 0 0}.msg{color:#94a3b8;font-size:14px}
+h2{margin:18px 0 8px;font-size:14px;color:#93c5fd;text-transform:uppercase;letter-spacing:.06em}
+input{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #2a3550;background:#111a2e;color:#e5e9f2;width:100%;margin-bottom:12px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px}
+.tabs button{flex:none;white-space:nowrap;font:inherit;background:#111a2e;border:1px solid #2a3550;color:#cbd5e1;border-radius:999px;padding:9px 16px;cursor:pointer}
+.tabs button.on{background:#fff;color:#0b1220;border-color:#fff}
+.it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:#111a2e;border:1px solid #1e293b;border-radius:12px;margin-bottom:8px}
+.ok{color:#4ade80;font-weight:700}.no{color:#f87171;font-weight:700}
+.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.pc{background:#111a2e;border:1px solid #1e293b;border-radius:18px;overflow:hidden;display:flex;flex-direction:column}.pc.off{opacity:.6}
+.pc img,.ph{width:100%;height:160px;object-fit:cover;display:block}.pc img{cursor:zoom-in}
+.ph{background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:34px}
+.in{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}.d{color:#94a3b8;font-size:13px}
+.pr{color:#fbbf24;font-weight:800;font-size:19px}.ask{color:#94a3b8;font-size:14px}
+.cta{display:inline-block;padding:9px 14px;border-radius:12px;background:#16a34a;color:#fff;font-weight:600;text-decoration:none;font-size:14px;text-align:center}.cta.g{background:#ffffff26}
+.acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}.acts .cta{flex:1;padding:8px 4px;font-size:13px}
+#zoom{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#zoom img{max-width:100%;max-height:100%;border-radius:12px}
+<\/style><\/head><body><div class="wrap">
+<div class="hero"><div><h1>📱 Móviles Emanuel<\/h1><p class="sub">Actualizado: __FECHA__<\/p><\/div><div id="top"><\/div><\/div>
+<div class="tabs" id="tabs"><\/div>
+<input id="q" placeholder="🔍 Buscar...">
+<div id="list"><\/div>
+<\/div>
+<div id="zoom" onclick="this.style.display='none'"><img id="zi" alt=""><\/div>
+<script>
+var D = __DATA__, tab = "s";
+function $(i){ return document.getElementById(i); }
+function esc(t){ var d = document.createElement("div"); d.textContent = t; return d.innerHTML; }
+function dg(){ var d = String(D.t || "").replace(/[^0-9]/g, ""); if (d.length === 8 && d.charAt(0) === "5") d = "53" + d; return d; }
+function wa(txt){ var d = dg(); return d ? "https://wa.me/" + d + "?text=" + encodeURIComponent(txt) : ""; }
+function tl(){ return "tel:" + String(D.t || "").replace(/[^0-9+]/g, ""); }
+function est(ok){ return '<span class="' + (ok ? 'ok' : 'no') + '">' + (ok ? '✅ Disponible' : '⛔ No disponible en el momento') + '<\/span>'; }
+function zoomIt(i){ $("zi").src = i.src; $("zoom").style.display = "flex"; }
+function card(x){
+  var w = wa("Hola, me interesa: " + x[1] + (x[3] > 0 ? " (" + x[3] + " CUP)" : "") + ". ¿Sigue disponible?");
+  return '<div class="pc' + (x[2] ? '' : ' off') + '">' + (x[4] ? '<img src="' + x[4] + '" alt="" onclick="zoomIt(this)">' : '<div class="ph">🛍️<\/div>') +
+    '<div class="in"><b>' + esc(x[1]) + '<\/b>' + (x[5] ? '<div class="d">' + esc(x[5]) + '<\/div>' : '') +
+    (x[3] > 0 ? '<div class="pr">' + x[3] + ' CUP<\/div>' : '<div class="ask">Consulta el precio<\/div>') + est(x[2]) +
+    (D.t ? '<div class="acts">' + (w ? '<a class="cta" target="_blank" rel="noopener" href="' + w + '">💬 Preguntar<\/a>' : '') + '<a class="cta g" href="' + tl() + '">📞 Llamar<\/a><\/div>' : '') +
+    '<\/div><\/div>';
+}
+function drawTabs(){
+  var t = [["s", "📟 Pantallas"]];
+  D.k.forEach(function(c){ if (D.a.some(function(a){ return a[0] === c[0]; })) t.push([c[0], c[1] + " " + c[0]]); });
+  $("tabs").innerHTML = t.map(function(x){ return '<button data-t="' + esc(x[0]).replace(/"/g, "&quot;") + '"' + (x[0] === tab ? ' class="on"' : '') + '>' + esc(x[1]) + '<\/button>'; }).join("");
+}
+$("tabs").onclick = function(e){ var t = e.target.getAttribute("data-t"); if (t === null) return; tab = t; $("q").value = ""; drawTabs(); render(); };
+function render(){
+  var q = $("q").value.trim().toLowerCase(), h = "";
+  if (tab === "s") {
+    var s = D.s.filter(function(x){ return !q || (x[0] + " " + x[1]).toLowerCase().indexOf(q) !== -1; })
+      .sort(function(a, b){ return (a[0] + a[1]).localeCompare(b[0] + b[1]); });
+    var last = null;
+    s.forEach(function(x){
+      if (x[0] !== last) { last = x[0]; h += '<h2>' + esc(x[0]) + '<\/h2>'; }
+      h += '<div class="it"><b>' + esc(x[1]) + '<\/b>' + est(x[2]) + '<\/div>';
+    });
+    if (!s.length) h = '<p class="msg">No hay resultados.<\/p>';
+  } else {
+    var a = D.a.filter(function(x){ return x[0] === tab && (!q || (x[1] + " " + (x[5] || "")).toLowerCase().indexOf(q) !== -1); })
+      .sort(function(x, y){ return (y[2] - x[2]) || x[1].localeCompare(y[1]); });
+    h = a.length ? '<div class="shop">' + a.map(card).join("") + '<\/div>' : '<p class="msg">No hay resultados.<\/p>';
+  }
+  $("list").innerHTML = h;
+}
+if (D.t) $("top").innerHTML = '<a class="cta g" href="' + tl() + '">📞 ' + esc(D.t) + '<\/a>';
+$("q").oninput = render; drawTabs(); render();
+<\/script><\/body><\/html>`;
 function exportCatalogo(){
   if (!isAdmin()) return;
   var ids = db.accesorios.filter(function(a){ return a.foto; }).map(function(a){ return a.foto; });
@@ -910,7 +1153,9 @@ function exportCatalogo(){
     if (hecho) return; hecho = true;
     var data = {
       s: db.screens.map(function(x){ return [x.marca, x.modelo, x.cant > 0 ? 1 : 0]; }),
-      a: db.accesorios.map(function(x){ return [x.tipo, x.nombre, x.disp ? 1 : 0, x.precio || 0, x.foto ? (FOTOS[x.foto] || "") : ""]; })
+      a: db.accesorios.map(function(x){ return [x.tipo, x.nombre, x.disp ? 1 : 0, x.precio || 0, x.foto ? (FOTOS[x.foto] || "") : "", x.desc || ""]; }),
+      t: db.cfg.tel || "",
+      k: catList().map(function(c){ return [c.n, c.i || "🛍️"]; })
     };
     var json = JSON.stringify(data).replace(/</g, "\\u003c");
     var page = CAT_TPL.replace("__FECHA__", function(){ return new Date().toLocaleString("es"); })
@@ -943,7 +1188,7 @@ function delPlan(){
     run: function(){ db.screens = []; } };
   if (t === "inv_zero") return { n: db.screens.length, txt: "las cantidades de " + db.screens.length + " modelos (quedan en 0)",
     run: function(){ db.screens.forEach(function(s){ s.cant = 0; }); } };
-  if (t === "acc") return { n: db.accesorios.length, txt: db.accesorios.length + " mica(s)/cover(s) del catálogo",
+  if (t === "acc") return { n: db.accesorios.length, txt: db.accesorios.length + " artículo(s) de la tienda (micas, covers, teléfonos…)",
     run: function(){ db.accesorios.forEach(function(a){ if (a.foto) delFoto(a.foto); }); db.accesorios = []; } };
   if (t === "notes") return { n: db.notes.length, txt: db.notes.length + " nota(s)",
     run: function(){ db.notes = []; } };
