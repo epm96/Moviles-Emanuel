@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Móviles Emanuel</title>
+<script>(function(){try{if(localStorage.getItem("tema")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})()</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <style>
@@ -56,6 +57,18 @@ textarea{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid #2a3
 .item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #1e293b;flex-wrap:wrap}
 .item .tx{flex:1;min-width:180px}
 .item small{color:#94a3b8;display:block}
+.protoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:6px}
+.protoBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:22px 12px;min-height:130px;background:#111a2e;border:1px solid #1e293b;border-radius:16px;color:#e5e9f2;font-size:16px;font-weight:700}
+.protoBtn i{font-style:normal;font-size:38px;line-height:1}
+.protoBtn:hover{border-color:#3b82f6;opacity:1;transform:translateY(-2px)}
+html[data-theme="light"] .protoBtn{background:#fff;color:#0f172a;border-color:#cbd5e1}
+.pstep{display:flex;gap:12px;align-items:flex-start;padding:12px;margin-bottom:8px;background:#0b1220;border:1px solid #1e293b;border-radius:12px;cursor:pointer}
+.pnum{flex:none;width:28px;height:28px;border-radius:50%;background:#1d4ed8;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ptxt{flex:1;line-height:1.45}
+.pstep.done{opacity:.55}
+.pstep.done .ptxt{text-decoration:line-through}
+.pstep.done .pnum{background:#16a34a}
+html[data-theme="light"] .pstep{background:#f8fafc;border-color:#cbd5e1}
 .tag{background:#1d4ed8;border-radius:8px;padding:2px 8px;font-size:12px}
 .pay{background:#0f2a1a;border:1px solid #166534;border-radius:12px;padding:12px;margin-top:10px}
 .pay b{font-size:18px;color:#4ade80}
@@ -270,9 +283,224 @@ body:not(.tech) .tecOnly{display:none!important}
 @media(max-width:760px){#login{gap:6px;padding:14px;align-items:flex-start}.lscene{flex-basis:100%}.lstage{width:300px;height:330px;margin-top:18px;transform:scale(.82);transform-origin:50% 0;margin-bottom:-50px}.lchips{display:none}}
 @media(prefers-reduced-motion:reduce){.ly,.lfloat,.l-placa::after,.l-placa u{animation:none!important}}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+/* ================= REDISEÑO 3D (solo estilos, el código no cambia) =================
+   FONDO DEL ADMIN: cambia la imagen en la variable --fondo-admin.
+   Ejemplo: --fondo-admin:url("https://tu-sitio.com/mi-taller.jpg");
+   ===================================================================================== */
+:root{
+ --fondo-admin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230f2a5c'/%3E%3Cstop offset='1' stop-color='%23311a63'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='300' fill='url(%23g)'/%3E%3Cg fill='none' stroke='%2360a5fa' stroke-opacity='.28' stroke-width='2'%3E%3Cpath d='M0 220h260l30-40h220l30 40h180l40-60h240'/%3E%3Cpath d='M0 120h180l40 40h200l30-30h260l30 30h260'/%3E%3Ccircle cx='260' cy='220' r='5'/%3E%3Ccircle cx='740' cy='220' r='5'/%3E%3Ccircle cx='420' cy='160' r='5'/%3E%3C/g%3E%3Cg fill='%23ffffff' fill-opacity='.07'%3E%3Cpath d='M980 150l14-10 10 4 6-14 16 2 4 14 12 6 12-10 12 12-10 12 6 12 14 4 2 16-14 6-4 12 10 12-12 12-12-10-12 6-4 14-16 2-6-14-10 4-14-10-6 10-14-6 4-14-10-10-14 2-2-16 14-6 4-12-10-12 12-12z'/%3E%3Crect x='120' y='60' width='150' height='26' rx='13' transform='rotate(-28 195 73)'/%3E%3Crect x='830' y='215' width='190' height='22' rx='11' transform='rotate(18 925 226)'/%3E%3C/g%3E%3C/svg%3E");
+ --sombra3d:0 1px 0 #ffffff14 inset,0 18px 30px -18px #000,0 6px 10px -6px #000a;
+}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ---- botones con relieve ---- */
+button{box-shadow:0 1px 0 #ffffff30 inset,0 6px 14px -6px #000;transition:transform .12s,box-shadow .12s,filter .12s}
+button:hover{opacity:1;filter:brightness(1.12);transform:translateY(-1px)}
+button:active{transform:translateY(1px);box-shadow:0 1px 0 #ffffff20 inset,0 2px 6px -3px #000}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.cta:focus-visible{outline:2px solid #93c5fd;outline-offset:2px}
+input,select,textarea{box-shadow:0 2px 6px -3px #000 inset;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #3b82f633}
+
+/* ---- tarjetas con profundidad ---- */
+.card,.stat{background:linear-gradient(160deg,#16213b,#0f172a);border:1px solid #ffffff12;box-shadow:var(--sombra3d)}
+.card{border-radius:18px}
+.stat{border-radius:16px;transition:transform .18s}
+.stat:hover{transform:translateY(-3px) perspective(600px) rotateX(3deg)}
+aside{background:linear-gradient(180deg,#111c35,#0a1020);box-shadow:8px 0 30px -14px #000;border-right:1px solid #ffffff10}
+.nav{border-radius:12px;transition:background .15s,transform .15s}
+.nav:hover{background:#1e293b;transform:translateX(3px)}
+.nav.on{background:linear-gradient(135deg,#2563eb,#7c3aed);box-shadow:0 8px 18px -8px #6d28d9}
+
+/* ---- FONDO DE TALLER en la parte de arriba del admin / técnico ---- */
+body:not(.cli) main{position:relative}
+body:not(.cli) main::before{content:"";display:block;height:130px;margin:-22px -22px 18px;border-bottom:1px solid #ffffff1a;
+ background:linear-gradient(180deg,#0b122200 40%,#0b1220 100%),var(--fondo-admin) center/cover no-repeat;box-shadow:0 14px 30px -18px #000}
+@media(max-width:760px){body:not(.cli) main::before{height:90px}}
+
+/* ---- MENÚ DEL CLIENTE: hacia abajo, todo visible, sin deslizar de lado ---- */
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;overflow:visible;padding:4px 0 16px;perspective:900px}
+.tabb{width:100%;white-space:normal;text-align:center;line-height:1.25;border-radius:16px;padding:14px 10px;font-size:14px;font-weight:600;
+ background:linear-gradient(160deg,#1a2744,#0f172a);border:1px solid #ffffff1a;color:#dbe4f5;box-shadow:var(--sombra3d);transform-style:preserve-3d}
+.tabb:hover{transform:translateY(-3px) rotateX(6deg);border-color:#60a5fa;filter:none}
+.tabb.on{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 16px 28px -12px #6d28d9,0 1px 0 #ffffff55 inset;transform:translateY(-2px)}
+@media(max-width:520px){.tabs{grid-template-columns:repeat(2,1fr)}}
+
+/* ---- tienda: tarjetas y modelos en 3D suave ---- */
+.hero{box-shadow:0 30px 60px -26px #6d28d9,0 1px 0 #ffffff30 inset}
+.mod{background:linear-gradient(160deg,#16213b,#0f172a);border-color:#ffffff12;box-shadow:var(--sombra3d)}
+.mod:hover{transform:translateY(-3px) perspective(700px) rotateX(4deg)}
+.pc2{background:linear-gradient(170deg,#16213b,#0d1424);border-color:#ffffff12;box-shadow:var(--sombra3d);transform-style:preserve-3d}
+.pc2:hover{transform:translateY(-6px) perspective(900px) rotateX(3deg);box-shadow:0 30px 40px -22px #000,0 0 0 1px #3b82f6}
+.csrow .csearch,.cok{box-shadow:var(--sombra3d)}
+#topbar{box-shadow:0 10px 24px -14px #000}
+.avbox,.box{box-shadow:0 30px 70px -20px #000,0 1px 0 #ffffff30 inset}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ================= v3: aspecto profesional ================= */
+body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;letter-spacing:.005em;background:radial-gradient(900px 500px at 0 -10%,#2563eb26,transparent 60%),radial-gradient(800px 460px at 100% 0,#7c3aed26,transparent 55%),#080d19;background-attachment:fixed}
+h3{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:16px}
+/* barra lateral */
+aside{background:#0c1426ee;backdrop-filter:blur(14px);padding:20px 14px;gap:4px}
+aside h2{font-size:18px;font-weight:800;letter-spacing:-.01em;padding:4px 10px 14px;margin:0 0 8px;border-bottom:1px solid #ffffff12}
+.nav{padding:11px 12px;font-weight:600;font-size:14px;color:#aebbd1;box-shadow:none;border:1px solid transparent}
+.nav:hover{background:#ffffff0d;color:#fff;transform:none;filter:none}
+.nav.on{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;box-shadow:0 10px 22px -10px #7c3aed}
+.who{padding:12px;border-top:1px solid #ffffff12;margin-top:auto}
+aside>button.gray{background:#ffffff0f;box-shadow:none;border:1px solid #ffffff14;margin-top:8px}
+/* tarjetas y estadísticas */
+.card{border-radius:20px;padding:20px;border:1px solid #ffffff14}
+.stat{position:relative;overflow:hidden;padding:16px 16px 14px}
+.stat::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#8b5cf6)}
+.stat b{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.stat span{font-weight:600;letter-spacing:.01em}
+/* tablas */
+table{border-collapse:separate;border-spacing:0}
+th{background:#0d162b;color:#8fa2c4;font-weight:700;letter-spacing:.06em;position:sticky;top:0}
+th:first-child{border-radius:10px 0 0 10px}th:last-child{border-radius:0 10px 10px 0}
+td{border-bottom:1px solid #ffffff0d}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:#ffffff08}
+.scroll{border-radius:14px}
+/* botones y campos */
+button{border-radius:12px;font-weight:700;letter-spacing:.01em}
+button:not(.gray):not(.red):not(.green):not(.nav):not(.tabb):not(.sch){background:linear-gradient(135deg,#3b82f6,#6366f1)}
+button.green{background:linear-gradient(135deg,#16a34a,#059669)}
+button.red{background:linear-gradient(135deg,#ef4444,#dc2626)}
+button.gray{background:#27344d}
+input,select,textarea{border-radius:12px;background:#0d1528;border:1px solid #26355a}
+input::placeholder,textarea::placeholder{color:#6f81a3}
+/* barra superior de metas */
+#topbar{backdrop-filter:blur(12px);background:#0c1426e6}
+/* panel de fondo (admin) */
+.fondoCard{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.fondoPrev{flex:1 1 260px;min-height:96px;border-radius:16px;border:1px dashed #ffffff30;background:var(--fondo-admin) center/cover no-repeat;box-shadow:var(--sombra3d)}
+.fondoAct{flex:1 1 220px;display:flex;flex-direction:column;gap:8px}
+.fondoAct input[type=file]{display:none}
+.fondoAct label.btnf{display:block;text-align:center;padding:11px 12px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 6px 14px -6px #000}
+/* banner del taller más fino, con título */
+body:not(.cli) main::before{height:150px;margin:-22px -22px 22px;border-radius:0 0 28px 28px;background:linear-gradient(180deg,#0b122200 30%,#0b1220cc 100%),var(--fondo-admin) center/cover no-repeat}
+body:not(.cli) main::after{content:"🔧  Móviles Emanuel · Taller";position:absolute;left:4px;top:88px;font-size:22px;font-weight:800;letter-spacing:-.01em;text-shadow:0 3px 14px #000;pointer-events:none}
+@media(max-width:760px){body:not(.cli) main::before{height:110px}body:not(.cli) main::after{top:62px;font-size:18px}}
+/* tienda de clientes */
+.hero{border-radius:28px;padding:30px}
+.hl{font-size:32px;letter-spacing:-.03em}
+.pc2{border-radius:22px}
+.pc2 .in2{padding:14px}
+.brand h4{color:#9db8ff}
+.tabs{gap:12px}
+.tabb{padding:16px 10px;font-size:14.5px}
+.wafab{box-shadow:0 18px 38px -12px #16a34a,0 1px 0 #ffffff40 inset}
+::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#2a3a5e;border-radius:8px}
+</style>
+<style id="tema-css">
+/* ================= MODO CLARO / OSCURO + EXTRAS VISUALES ================= */
+html{color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}
+.themeFab{position:fixed!important;left:14px;bottom:14px;z-index:70;width:48px!important;height:48px;padding:0!important;border-radius:50%!important;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;
+ background:#1e293bf2!important;border:1px solid #ffffff2a!important;color:#fff;box-shadow:0 10px 24px -8px #000a!important;backdrop-filter:blur(8px)}
+.themeFab span{display:block;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.themeFab:hover span{transform:rotate(25deg) scale(1.15)}
+html[data-theme="light"] .themeFab{background:#fffffff2!important;border-color:#cbd5e1!important;box-shadow:0 10px 24px -10px #1e293b66!important}
+html.tt *,html.tt *::before,html.tt *::after{transition:background-color .3s,color .3s,border-color .3s,box-shadow .3s!important}
+
+/* animaciones suaves */
+@keyframes vin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+main>div:not(.hidden){animation:vin .35s ease both}
+.chart rect{transform-box:fill-box;transform-origin:50% 100%;animation:grow .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.chart polyline{stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.2s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chart .gl{stroke:#1e293b}
+.stat{transition:transform .18s,box-shadow .18s}
+.stat:hover{box-shadow:0 18px 30px -16px #3b82f6aa}
+@media(prefers-reduced-motion:reduce){main>div,.chart rect,.chart polyline{animation:none!important}.chart polyline{stroke-dashoffset:0}}
+
+/* estadísticas nuevas */
+.xgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.xgrid .card{margin-bottom:0}
+.donutw{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:10px}
+.donutw svg{width:170px;height:170px;flex:none}
+.donutw .ctr{font-weight:800;font-size:17px;fill:currentColor}
+.donutw .cts{font-size:10px;fill:#94a3b8}
+.dleg{flex:1;min-width:150px;display:flex;flex-direction:column;gap:7px;font-size:13px}
+.dleg div{display:flex;align-items:center;gap:8px}
+.dleg b{margin-left:auto}
+.rk{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.rk .r1{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:5px}
+.rk .r1 span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk .r1 b{white-space:nowrap}
+.rk .track{height:9px;border-radius:99px;background:#ffffff12;overflow:hidden}
+.rk .track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#3b82f6,#8b5cf6);transform-origin:left;animation:bgrow .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bgrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.rk small{color:#94a3b8;font-size:12px}
+.insight{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#3b82f622,#8b5cf622);border:1px solid #6366f155;border-radius:16px;padding:12px 14px;margin-top:12px;font-size:14px}
+.insight .em{font-size:26px}
+
+/* ================= TEMA CLARO ================= */
+html[data-theme="light"] body{color:#0f172a;background:radial-gradient(900px 500px at 0 -10%,#3b82f624,transparent 60%),radial-gradient(800px 460px at 100% 0,#8b5cf622,transparent 55%),#eef2f9;background-attachment:fixed}
+html[data-theme="light"]{--sombra3d:0 1px 0 #fff inset,0 12px 26px -16px #1e293b55,0 2px 6px -3px #1e293b22}
+html[data-theme="light"] input,html[data-theme="light"] select,html[data-theme="light"] textarea{background:#fff;color:#0f172a;border-color:#cbd5e1;box-shadow:0 1px 2px #0f172a12 inset}
+html[data-theme="light"] input::placeholder,html[data-theme="light"] textarea::placeholder{color:#94a3b8}
+html[data-theme="light"] input:focus,html[data-theme="light"] select:focus,html[data-theme="light"] textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f633}
+html[data-theme="light"] button{box-shadow:0 1px 0 #ffffff55 inset,0 6px 14px -8px #1e293b77}
+html[data-theme="light"] button.gray{background:#e2e8f0;color:#1e293b}
+html[data-theme="light"] button.gray:hover{background:#d5deec}
+html[data-theme="light"] aside{background:#ffffffee;border-right:1px solid #e2e8f0;box-shadow:8px 0 30px -20px #1e293b55}
+html[data-theme="light"] aside h2{border-bottom-color:#e2e8f0}
+html[data-theme="light"] .nav{color:#475569}
+html[data-theme="light"] .nav:hover{background:#e8eefc;color:#1d4ed8}
+html[data-theme="light"] .nav.on,html[data-theme="light"] .nav.on:hover{color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed)}
+html[data-theme="light"] aside>button.gray{background:#f1f5f9;border:1px solid #e2e8f0;color:#334155}
+html[data-theme="light"] .who{border-top-color:#e2e8f0;color:#64748b}
+html[data-theme="light"] #topbar{background:#ffffffe8;border-bottom-color:#e2e8f0}
+html[data-theme="light"] .card,html[data-theme="light"] .stat,html[data-theme="light"] .mod,html[data-theme="light"] .pc2,html[data-theme="light"] .pc{background:#fff;border-color:#e2e8f0;box-shadow:var(--sombra3d)}
+html[data-theme="light"] .stat span,html[data-theme="light"] .msg,html[data-theme="light"] .pdesc,html[data-theme="light"] .price.ask,html[data-theme="light"] .item small,html[data-theme="light"] .flat,html[data-theme="light"] .rk small{color:#64748b}
+html[data-theme="light"] th{background:#f1f5f9;color:#64748b}
+html[data-theme="light"] th,html[data-theme="light"] td{border-bottom-color:#e8edf4}
+html[data-theme="light"] tbody tr:hover{background:#f6f8fc}
+html[data-theme="light"] .item{border-bottom-color:#e8edf4}
+html[data-theme="light"] .up,html[data-theme="light"] .ok,html[data-theme="light"] .day h4 span{color:#16a34a}
+html[data-theme="light"] .dn,html[data-theme="light"] .zero,html[data-theme="light"] #err{color:#dc2626}
+html[data-theme="light"] .low{color:#b45309}
+html[data-theme="light"] .pr{color:#b45309}
+html[data-theme="light"] .pay{background:#ecfdf3;border-color:#86efac}
+html[data-theme="light"] .pay b{color:#15803d}
+html[data-theme="light"] .brand h4{color:#4f46e5}
+html[data-theme="light"] .brand h4 small{background:#e2e8f0;color:#64748b}
+html[data-theme="light"] .tabb{background:#fff;color:#334155;border-color:#e2e8f0}
+html[data-theme="light"] .tabb:hover{border-color:#3b82f6}
+html[data-theme="light"] .tabb.on{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border-color:transparent}
+html[data-theme="light"] .cok,html[data-theme="light"] .chip{background:#fff;color:#334155;border-color:#d5deec}
+html[data-theme="light"] .seg{background:#e8edf5;border-color:#d5deec}
+html[data-theme="light"] .seg button{color:#475569;box-shadow:none}
+html[data-theme="light"] .seg button.on{background:#3b82f6;color:#fff}
+html[data-theme="light"] .sch{background:#fff;color:#334155;border-color:#d5deec}
+html[data-theme="light"] .sch.on{border-color:var(--c)}
+html[data-theme="light"] .ph,html[data-theme="light"] .pc2 .ph{background:#e2e8f0}
+html[data-theme="light"] .best span{color:#475569}
+html[data-theme="light"] .pill.on{color:#15803d}
+html[data-theme="light"] .pill.off{color:#dc2626}
+html[data-theme="light"] .chart text,html[data-theme="light"] .cts{fill:#64748b}
+html[data-theme="light"] .chart .gl{stroke:#e2e8f0}
+html[data-theme="light"] .rk .track{background:#e2e8f0}
+html[data-theme="light"] .insight{background:linear-gradient(135deg,#3b82f61a,#8b5cf61a);border-color:#6366f144}
+html[data-theme="light"] ::-webkit-scrollbar-thumb{background:#c3cde0}
+html[data-theme="light"] .fondoPrev{border-color:#94a3b855}
+html[data-theme="light"] body:not(.cli) main::before{border-bottom-color:#e2e8f0;box-shadow:0 14px 30px -20px #1e293b66;background:linear-gradient(180deg,#eef2f900 30%,#eef2f9e6 100%),var(--fondo-admin) center/cover no-repeat}
+html[data-theme="light"] body:not(.cli) main::after{text-shadow:0 2px 12px #fff}
+/* login */
+html[data-theme="light"] #login{background:radial-gradient(circle at 20% 20%,#3b82f633 0,transparent 42%),radial-gradient(circle at 80% 80%,#8b5cf633 0,transparent 42%),#eef2f9}
+html[data-theme="light"] .box{background:#ffffffd9;border-color:#e2e8f0;box-shadow:0 30px 70px -30px #1e293b66}
+html[data-theme="light"] .box p{color:#64748b}
+html[data-theme="light"] .ltag,html[data-theme="light"] .lchips span{background:#ffffffcc;border-color:#d5deec;color:#334155}
+html[data-theme="light"] .lhint{color:#6366f1}
+/* estilos en línea */
+html[data-theme="light"] [style*="color:#cbd5e1"]{color:#475569!important}
+html[data-theme="light"] [style*="background:#0b1220"]{background:#fff!important;border-color:#e2e8f0!important}
+html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-color:#e2e8f0!important}
 </style>
 </head>
 <body>
+<button id="themeBtn" class="gray themeFab" type="button" aria-label="Cambiar entre modo claro y oscuro" title="Modo claro / oscuro" onclick="toggleTheme()"><span id="themeIco">☀️</span></button>
 
 <section id="login">
 <div class="lscene" aria-hidden="true">
@@ -330,6 +558,7 @@ body:not(.tech) .tecOnly{display:none!important}
 <button class="nav noCli" id="n-profile" onclick="show('profile')">👤 Mi perfil</button>
 <button class="nav adminOnly" id="n-pay" onclick="show('pay')">💵 Pagos técnico</button>
 <button class="nav noCli" id="n-notes" onclick="show('notes')">🗒️ Notas</button>
+<button class="nav noCli" id="n-proto" onclick="show('proto')">🛠️ Protocolo de reparación</button>
 <button class="nav adminOnly" id="n-acc" onclick="show('acc')">🛍️ Tienda clientes</button>
 <button class="nav adminOnly" id="n-users" onclick="show('users')">👥 Usuarios</button>
 <button class="nav adminOnly" id="n-backup" onclick="show('backup')">💾 Respaldo</button>
@@ -587,6 +816,7 @@ body:not(.tech) .tecOnly{display:none!important}
 <b>📋 Detalle por servicio</b>
 <div class="scroll" style="margin-top:8px"><table style="min-width:520px"><thead><tr><th>Servicio</th><th>Cant.</th><th>Cobrado</th><th>Ganancia real</th><th>Vs período anterior</th></tr></thead><tbody id="sttb"></tbody></table></div>
 </div>
+<div id="stx"></div>
 </div>
 
 <div id="v-tstats" class="hidden">
@@ -616,6 +846,7 @@ body:not(.tech) .tecOnly{display:none!important}
 <b>🌟 Mi récord histórico</b>
 <p class="msg" id="trec"></p>
 </div>
+<div id="tx"></div>
 </div>
 
 <div id="v-profile" class="hidden">
@@ -682,6 +913,21 @@ body:not(.tech) .tecOnly{display:none!important}
 <div class="card" id="nlist"></div>
 </div>
 
+<div id="v-proto" class="hidden">
+<h3>🛠️ Protocolo de reparación</h3>
+<div id="protoHome">
+<p class="msg">Guía paso a paso para reparar con facilidad. Elige el problema del equipo:</p>
+<div class="protoGrid" id="protoGrid"></div>
+</div>
+<div id="protoDetail" class="hidden">
+<button class="gray sm" onclick="protoBack()">← Volver</button>
+<div class="card" style="margin-top:12px">
+<h3 id="protoTitle" style="margin-bottom:8px"></h3>
+<div id="protoBody"></div>
+</div>
+</div>
+</div>
+
 <div id="v-users" class="hidden">
 <h3>Usuarios</h3>
 <div class="card">
@@ -745,7 +991,7 @@ body:not(.tech) .tecOnly{display:none!important}
 <script id="seed" type="application/json">null</script>
 <script>
 "use strict";
-var SRC = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+var SRC = ("<!DOCTYPE html>\n" + document.documentElement.outerHTML).replace(/ data-theme="light"/, "");
 /* ====== CONFIGURACIÓN DE FIREBASE: pega aquí tus datos (ver guía) ====== */
 var FIREBASE_CONFIG = {
   apiKey: "AIzaSyAfMx5zgtrraNpx_TR2zMmHCZZk06eAaV0",
@@ -1009,7 +1255,7 @@ function show(v){
   if (me && me.role === "cliente") v = "client";
   if ((v === "users" || v === "backup" || v === "pay" || v === "acc" || v === "stats") && !isAdmin()) v = "screens";
   if (v === "tstats" && (!me || me.role !== "tecnico")) v = isAdmin() ? "stats" : "screens";
-  ["client","acc","screens","accinv","report","history","stats","tstats","profile","pay","notes","users","backup"].forEach(function(x){
+  ["client","acc","screens","accinv","report","history","stats","tstats","profile","pay","notes","proto","users","backup"].forEach(function(x){
     $("n-" + x).classList.toggle("on", x === v);
     $("v-" + x).classList.toggle("hidden", x !== v);
   });
@@ -1019,6 +1265,7 @@ function show(v){
   if (v === "report") renderReport();
   if (v === "history") renderHistory();
   if (v === "notes") renderNotes();
+  if (v === "proto") renderProto();
   if (v === "pay") renderPay();
   if (v === "profile") renderProfile();
   if (v === "backup") renderBackup();
@@ -2265,6 +2512,48 @@ function renderNotes(){
     box.appendChild(d);
   });
 }
+var PROTO = [
+  { id: "enciende", quick: "Primero confirma si hay señales de vida: vibra, enciende un LED, calienta o suena al conectarlo.", steps: ["Cargar 20–30 min con un cargador y cable que sepas que funcionan. Un equipo con batería en cero puede tardar en dar señales.", "Mantener el botón de encendido 10–15 s. Probar también el reinicio forzado (encendido + volumen según el modelo).", "Revisar si hay humedad, corrosión, golpe fuerte o batería hinchada. Si la batería está hinchada, no la cargues: cámbiala.", "Probar con otra batería que funcione. Si el equipo es de batería extraíble, limpiar sus contactos.", "Conectar a fuente de poder (si tienes) y mirar el consumo: sin consumo = batería, conector o botón de encendido; consumo alto y fijo = posible cortocircuito; consumo que sube y baja = sí intenta arrancar (revisar software o pantalla).", "Desconectar uno a uno los flex (pantalla, cámaras, placa de carga, parlante) y volver a probar para descartar una pieza en corto.", "Revisar el botón de encendido y su flex; probar con uno bueno.", "Si enciende pero se queda en el logo o se reinicia solo: restaurar o reinstalar software (flasheo).", "Si nada funciona: revisar la placa (componentes quemados, línea de alimentación, PMIC). Se pasa a micro‑soldadura."], ico: "🔌", t: "No enciende" },
+  { id: "video", quick: "Confirma que el equipo sí enciende: vibra, suena, entran notificaciones o la PC lo reconoce. Si es así, el fallo es de pantalla o video.", steps: ["Mirar la pantalla con luz lateral o linterna: si se ve una imagen muy tenue, falla el backlight (luz de fondo).", "Revisar si la pantalla tiene golpes, manchas, líneas o está rota por dentro.", "Forzar reinicio y subir el brillo. Probar conectar a un cargador (a veces el equipo está en modo ahorro).", "Desconectar y volver a conectar el flex de pantalla; limpiar los contactos con alcohol isopropílico.", "Probar con una pantalla de prueba que funcione bien.", "Si con la pantalla buena sigue sin video: revisar el conector de pantalla en la placa (pines doblados, sucios o corroídos).", "Revisar cortos o componentes dañados en la línea de la pantalla y el circuito de backlight en la placa.", "Si es por humedad: limpiar la placa con alcohol isopropílico y secar bien antes de volver a probar."],    ico: "🖥️", t: "No da video" },
+  { id: "carga", quick: "Antes de abrir el equipo, descarta cargador, cable y puerto sucio.", steps: ["Probar con otro cargador, otro cable y otro tomacorriente (que sean buenos).", "Limpiar el puerto de carga con un palillo no metálico y alcohol isopropílico; la pelusa es la causa más común.", "Revisar si el conector está flojo, doblado o si el cable solo carga en cierta posición.", "Observar si sale el ícono de carga y si carga lento o de forma intermitente. Medir con un probador USB (voltaje y corriente) si tienes.", "Reiniciar el equipo para descartar software.", "Revisar la batería: probar con otra buena. Si está hinchada o muy gastada, cambiarla.", "Cambiar la placa o flex de carga (sub‑placa) por una buena.", "Si persiste: revisar la placa (IC de carga, líneas de carga, componentes quemados). Se pasa a micro‑soldadura."],    ico: "🔋", t: "No carga" },
+  { id: "tactil", quick: "Identifica si falla todo el táctil, solo una zona o si se mueve solo (táctil fantasma).", steps: ["Limpiar la pantalla, quitar mica o protector y probar con las manos limpias y secas.", "Probar sin el cargador conectado y luego con el original (a veces un cargador malo mete ruido en el táctil).", "Reiniciar y probar en modo seguro para descartar una app.", "Si se cayó o se mojó: revisar si la pantalla está rota por dentro o con humedad.", "Desconectar y volver a conectar el flex de la pantalla; limpiar contactos.", "Probar con una pantalla buena. Si funciona, cambiar la pantalla.", "Si con pantalla buena sigue igual: revisar el conector de pantalla en la placa y el IC del táctil.", "Verificar actualización o reinstalación de software si el fallo apareció después de una actualización."],   ico: "👆", t: "No da táctil" },
+  { id: "senal", quick: "Revisa si aparece \"Sin servicio\", \"Sin SIM\" o si tiene IMEI (marca *#06#).", steps: ["Probar la SIM en otro teléfono y probar otra SIM en este equipo.", "Limpiar la SIM y la bandeja; revisar que la bandeja no esté doblada ni floja.", "Activar y desactivar modo avión, reiniciar, y buscar la red manualmente.", "Revisar APN y ajustes de red; probar restablecer ajustes de red.", "Marcar *#06#: si no aparece el IMEI o sale vacío, es problema de software o baseband.", "Confirmar que el equipo no esté bloqueado a otro operador y que soporte las bandas de la red.", "Abrir y revisar antenas, cables coaxiales y conectores de señal (se aflojan con golpes o humedad).", "Revisar el lector de SIM en la placa (pines doblados o sucios).", "Reinstalar o actualizar el software (flasheo) si perdió IMEI o baseband.", "Si persiste: revisar IC de radiofrecuencia y amplificador en la placa. Se pasa a micro‑soldadura."],    ico: "📶", t: "No da señal (cobertura)" },
+  { id: "microfono", quick: "Identifica cuál micrófono falla: el de llamadas (abajo), el de video o el de ruido (arriba).", steps: ["Probar con la grabadora de voz, una llamada normal y una llamada en altavoz para ubicar cuál falla.", "Revisar permisos del micrófono en las apps y cerrar apps que lo estén usando. Probar en modo seguro.", "Quitar la funda o mica que pueda tapar el orificio del micrófono.", "Limpiar el orificio con un cepillo suave o aire; no uses objetos metálicos.", "Probar con unos audífonos con micrófono: si funcionan, el problema es el micrófono; si no, puede ser la placa o el software.", "Cambiar el micrófono o la placa/flex de carga (en muchos modelos el micrófono viene en esa sub‑placa).", "Reiniciar o reinstalar software si el fallo apareció tras una actualización.", "Si persiste: revisar el IC de audio y sus líneas en la placa. Se pasa a micro‑soldadura."],ico: "🎤", t: "No funciona el micrófono" }
+];
+function renderProto(){
+  var g = $("protoGrid"); g.innerHTML = "";
+  PROTO.forEach(function(p, i){
+    var b = document.createElement("button"); b.className = "protoBtn";
+    var ic = document.createElement("i"); ic.textContent = p.ico;
+    var tx = document.createElement("span"); tx.textContent = (i + 1) + ". " + p.t;
+    b.appendChild(ic); b.appendChild(tx);
+    b.onclick = function(){ openProto(p.id); };
+    g.appendChild(b);
+  });
+  $("protoHome").classList.remove("hidden"); $("protoDetail").classList.add("hidden");
+}
+function openProto(id){
+  var p = PROTO.filter(function(x){ return x.id === id; })[0]; if (!p) return;
+  $("protoTitle").textContent = p.ico + " " + p.t;
+  var b = $("protoBody"); b.innerHTML = "";
+  var q = document.createElement("p"); q.className = "msg"; q.textContent = p.quick; b.appendChild(q);
+  var hint = document.createElement("p"); hint.className = "msg"; hint.textContent = "Toca cada paso para marcarlo como hecho.";
+  b.appendChild(hint);
+  p.steps.forEach(function(t, i){
+    var d = document.createElement("div"); d.className = "pstep";
+    var n = document.createElement("span"); n.className = "pnum"; n.textContent = i + 1;
+    var x = document.createElement("span"); x.className = "ptxt"; x.textContent = t;
+    d.appendChild(n); d.appendChild(x);
+    d.onclick = function(){ d.classList.toggle("done"); };
+    b.appendChild(d);
+  });
+  var f = document.createElement("p"); f.className = "msg"; f.style.marginTop = "14px";
+  f.textContent = "Guía base general. Ajusta los pasos según el modelo del equipo.";
+  b.appendChild(f);
+  $("protoHome").classList.add("hidden"); $("protoDetail").classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+function protoBack(){ renderProto(); }
 function addNote(){
   if (!me || me.role === "cliente") return;
   var t = $("ntext").value.trim();
@@ -2350,7 +2639,7 @@ function chartFrame(labels, lo, hi, W, H, pl, pr, pt, pb){
   function y(v){ return pt + (hi - v) / (hi - lo) * (H - pt - pb); }
   for (i = 0; i <= 4; i++) {
     var v = lo + (hi - lo) * i / 4;
-    s += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="#1e293b"/>' +
+    s += '<line class="gl" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="#1e293b"/>' +
          '<text x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + fmtK(v) + '</text>';
   }
   for (i = 0; i < n; i += step) s += '<text x="' + (pl + bw * i + bw / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + labels[i] + '</text>';
@@ -2428,7 +2717,10 @@ function renderStats(){
     ["⛪ Diezmo " + DIEZMO + "%", money(Math.max(0, C.tot.real) * DIEZMO / 100), ""],
     ["🔧 Trabajos", String(C.tot.n), deltaSmall(C.tot.n, P.tot.n)],
     ["📊 Promedio por " + rg.unit + " activo", act ? money(C.tot.real / act) : "0.00", ""],
-    ["🏆 Mejor " + rg.unit, bi >= 0 ? money(best) + " · " + labels[bi] : "—", ""]
+    ["🏆 Mejor " + rg.unit, bi >= 0 ? money(best) + " · " + labels[bi] : "—", ""],
+    ["📈 Margen de ganancia", C.tot.cobrado > 0 ? Math.round(C.tot.real / C.tot.cobrado * 100) + "%" : "0%", ""],
+    ["🎫 Ticket promedio", C.tot.n ? money(C.tot.cobrado / C.tot.n) : "0.00", ""],
+    ["💎 Ganancia por trabajo", C.tot.n ? money(C.tot.real / C.tot.n) : "0.00", ""]
   ];
   $("stkpi").innerHTML = kp.map(function(k){ return '<div class="stat"><span>' + k[0] + '</span><b>' + k[1] + '</b>' + k[2] + '</div>'; }).join("");
 
@@ -2514,7 +2806,9 @@ function renderTStats(){
     ["💰 Total ganado", money(tot), deltaSmall(tot, ptot)],
     ["🔧 Trabajos", String(nT), ""],
     ["📊 Promedio por día trabajado", act ? money(tot / act) : "0.00", ""],
-    ["📅 Días trabajados", String(act), ""]
+    ["📅 Días trabajados", String(act), ""],
+    ["🎫 Ganancia por trabajo", nT ? money(tot / nT) : "0.00", ""],
+    ["⚡ Trabajos por día", act ? (nT / act).toFixed(1) : "0.0", ""]
   ];
   $("tkpi").innerHTML = kp.map(function(k){ return '<div class="stat"><span>' + k[0] + '</span><b>' + k[1] + '</b>' + k[2] + '</div>'; }).join("");
 
@@ -2727,6 +3021,166 @@ function changePass(){
 }
 
 initLoginSaved();
+</script>
+<script>
+/* Opción "Fondo del taller" en el panel del admin (se guarda en la nube junto con el resto) */
+(function(){
+  var DEF = getComputedStyle(document.documentElement).getPropertyValue("--fondo-admin");
+  function ap(){
+    try{
+      var f = db && db.cfg && db.cfg.fondo;
+      document.documentElement.style.setProperty("--fondo-admin", f ? 'url("' + f + '")' : DEF);
+    }catch(e){}
+  }
+  window.fondoPick = function(inp){
+    var file = inp.files && inp.files[0]; if(!file) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      var im = new Image();
+      im.onload = function(){
+        var w = Math.min(1400, im.width), h = Math.round(im.height * w / im.width);
+        var c = document.createElement("canvas"); c.width = w; c.height = h;
+        c.getContext("2d").drawImage(im, 0, 0, w, h);
+        var q = .8, out = c.toDataURL("image/jpeg", q);
+        while(out.length > 160000 && q > .35){ q -= .1; out = c.toDataURL("image/jpeg", q); }
+        db.cfg.fondo = out; saveDB(); ap(); inp.value = "";
+        alert("Fondo guardado.");
+      };
+      im.src = rd.result;
+    };
+    rd.readAsDataURL(file);
+  };
+  window.fondoQuitar = function(){
+    if(!isAdmin()) return;
+    delete db.cfg.fondo; saveDB(); ap();
+  };
+  var acc = document.getElementById("v-acc");
+  if(acc){
+    var card = document.createElement("div"); card.className = "card";
+    card.innerHTML = '<b>🖼️ Fondo del taller (parte de arriba)</b>'
+      + '<p class="msg">Sube una foto de tu taller. Se ve arriba en el panel del admin y de los técnicos.</p>'
+      + '<div class="fondoCard"><div class="fondoPrev"></div><div class="fondoAct">'
+      + '<label class="btnf">📷 Elegir foto<input type="file" accept="image/*" onchange="fondoPick(this)"></label>'
+      + '<button class="gray" onclick="fondoQuitar()">Quitar y usar el predeterminado</button></div></div>';
+    var h = acc.querySelector(".row");
+    if(h && h.nextSibling) acc.insertBefore(card, h.nextSibling); else acc.appendChild(card);
+  }
+  setInterval(ap, 1500); ap();
+})();
+</script>
+
+<script>
+/* ---------- TEMA CLARO / OSCURO ---------- */
+function aplicarTema(t, anim){
+  var h = document.documentElement;
+  if (anim) { h.classList.add("tt"); setTimeout(function(){ h.classList.remove("tt"); }, 400); }
+  if (t === "light") h.setAttribute("data-theme", "light"); else h.removeAttribute("data-theme");
+  var i = document.getElementById("themeIco"); if (i) i.textContent = t === "light" ? "🌙" : "☀️";
+  try { var m = document.querySelector('meta[name="theme-color"]'); if (!m) { m = document.createElement("meta"); m.name = "theme-color"; document.head.appendChild(m); } m.content = t === "light" ? "#eef2f9" : "#0b1220"; } catch(e) {}
+}
+function toggleTheme(){
+  var t = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+  aplicarTema(t, true);
+  try { localStorage.setItem("tema", t); } catch(e) {}
+}
+(function(){ var t = "dark"; try { if (localStorage.getItem("tema") === "light") t = "light"; } catch(e) {} aplicarTema(t, false); })();
+
+/* ---------- ANIMACIÓN DE NÚMEROS ---------- */
+function countUp(box){
+  if (!box || (window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches)) return;
+  var bs = box.querySelectorAll(".stat b");
+  Array.prototype.forEach.call(bs, function(b){
+    var m = /^(-?\d+(?:\.\d+)?)(.*)$/.exec(b.textContent.trim());
+    if (!m) return;
+    var to = parseFloat(m[1]), dec = (m[1].split(".")[1] || "").length, rest = m[2], t0 = null;
+    function step(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / 700), e = 1 - Math.pow(1 - p, 3);
+      b.textContent = (to * e).toFixed(dec) + rest;
+      if (p < 1) requestAnimationFrame(step); else b.textContent = m[1] + rest;
+    }
+    requestAnimationFrame(step);
+  });
+}
+function _e(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+/* ---------- ESTADÍSTICAS EXTRA (ADMIN) ---------- */
+function svgDonut(parts, total){
+  var R = 62, C = 2 * Math.PI * R, off = 0, s = "";
+  parts.forEach(function(p){
+    var len = total > 0 ? p.v / total * C : 0;
+    s += '<circle cx="85" cy="85" r="' + R + '" fill="none" stroke="' + p.c + '" stroke-width="22" stroke-dasharray="' + len.toFixed(2) + " " + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 85 85)"><title>' + _e(p.n) + ": " + money(p.v) + ' CUP</title></circle>';
+    off += len;
+  });
+  return '<svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="' + R + '" fill="none" stroke="#94a3b833" stroke-width="22"/>' + s +
+    '<text class="ctr" x="85" y="86" text-anchor="middle">' + fmtK(total) + '</text><text class="cts" x="85" y="102" text-anchor="middle">CUP cobrado</text></svg>';
+}
+function rankHTML(rows){
+  var mx = Math.max.apply(null, rows.map(function(r){ return r.v; }).concat([1]));
+  return '<div class="rk">' + rows.map(function(r, i){
+    return '<div><div class="r1"><span>' + (["🥇","🥈","🥉"][i] || (i + 1) + ".") + " " + _e(r.n) + '</span><b>' + r.t + '</b></div><div class="track"><i style="width:' + Math.max(3, r.v / mx * 100).toFixed(1) + '%;animation-delay:' + (i * 0.07).toFixed(2) + 's"></i></div>' + (r.s ? '<small>' + r.s + '</small>' : '') + '</div>';
+  }).join("") + '</div>';
+}
+function statsExtra(){
+  var box = document.getElementById("stx"); if (!box || !isAdmin()) return;
+  var rg = stRange(ST.per, ST.ref || today()), C = stCompute(rg);
+  if (!C.tot.n) { box.innerHTML = ""; return; }
+  var rs = db.reports.filter(function(r){ return r.fecha >= rg.from && r.fecha <= rg.to; });
+
+  // 1) Distribución de ingresos por servicio
+  var parts = GRUPOS.map(function(g){ return { n: g.n, c: g.c, v: C.byG[g.k].cobrado }; }).filter(function(p){ return p.v > 0; });
+  var leg = parts.map(function(p){ return '<div><span class="dot" style="background:' + p.c + ';margin:0"></span>' + _e(p.n) + '<b>' + Math.round(p.v / C.tot.cobrado * 100) + '%</b></div>'; }).join("");
+  var c1 = '<div class="card"><b>🍩 De dónde viene el dinero</b><p class="msg">Reparto de lo cobrado por tipo de servicio.</p><div class="donutw">' + svgDonut(parts, C.tot.cobrado) + '<div class="dleg">' + leg + '</div></div></div>';
+
+  // 2) Ganancia por día de la semana
+  var wd = [0,0,0,0,0,0,0], wn = [0,0,0,0,0,0,0];
+  rs.forEach(function(r){
+    var i = (pd(r.fecha).getDay() + 6) % 7, costo = costoOf(r), pago = esAdminUser(r.user) ? 0 : pagoOf(r);
+    wd[i] += r.precio - costo - pago; wn[i]++;
+  });
+  var bi = 0; wn.forEach(function(v, i){ if (wn[i] > wn[bi]) bi = i; });
+  var bg = 0; wd.forEach(function(v, i){ if (wd[i] > wd[bg]) bg = i; });
+  var NOMS = ["lunes","martes","miércoles","jueves","viernes","sábado","domingo"];
+  var c2 = '<div class="card"><b>📆 Ganancia por día de la semana</b><p class="msg">Descubre qué días rinden más.</p><div class="chart">' + svgBars(wd, DIAS_C, 0) + '</div>' +
+    '<div class="insight"><span class="em">💡</span><span>Más trabajos: <b>' + NOMS[bi] + '</b> (' + wn[bi] + '). Más ganancia: <b>' + NOMS[bg] + '</b> (' + money(wd[bg]) + ' CUP).</span></div></div>';
+
+  // 3) Ranking de servicios
+  var bt = {};
+  rs.forEach(function(r){ var o = bt[r.tipo] || (bt[r.tipo] = { n: r.tipo, c: 0, q: 0 }); o.c += r.precio; o.q++; });
+  var top = Object.keys(bt).map(function(k){ return bt[k]; }).sort(function(a, b){ return b.c - a.c; }).slice(0, 6);
+  var c3 = '<div class="card"><b>🏅 Servicios que más dinero dejan</b>' + rankHTML(top.map(function(o){ return { n: o.n, v: o.c, t: money(o.c), s: o.q + (o.q === 1 ? " trabajo" : " trabajos") + " · " + Math.round(o.c / C.tot.cobrado * 100) + "% del total" }; })) + '</div>';
+
+  // 4) Ranking de técnicos
+  var bu = {};
+  rs.forEach(function(r){
+    var o = bu[r.user] || (bu[r.user] = { n: r.user, c: 0, q: 0, g: 0 });
+    o.c += r.precio; o.q++; o.g += r.precio - costoOf(r) - (esAdminUser(r.user) ? 0 : pagoOf(r));
+  });
+  var us = Object.keys(bu).map(function(k){ return bu[k]; }).sort(function(a, b){ return b.g - a.g; });
+  var c4 = '<div class="card"><b>👷 Rendimiento por persona</b>' + rankHTML(us.map(function(o){ return { n: o.n, v: Math.max(0, o.g), t: money(o.g) + " CUP", s: o.q + " trabajos · cobrado " + money(o.c) }; })) + '</div>';
+
+  box.innerHTML = '<div class="xgrid">' + c1 + c2 + c3 + c4 + '</div>';
+}
+function statsExtraT(){
+  var box = document.getElementById("tx"); if (!box || !me || me.role !== "tecnico") return;
+  var rg = stRange(TS.per, TS.ref || today());
+  var rs = db.reports.filter(function(r){ return r.user === me.user && r.fecha >= rg.from && r.fecha <= rg.to; });
+  if (!rs.length) { box.innerHTML = ""; return; }
+  var wd = [0,0,0,0,0,0,0];
+  rs.forEach(function(r){ wd[(pd(r.fecha).getDay() + 6) % 7] += pagoOf(r); });
+  var bg = 0; wd.forEach(function(v, i){ if (wd[i] > wd[bg]) bg = i; });
+  var NOMS = ["lunes","martes","miércoles","jueves","viernes","sábado","domingo"];
+  var bt = {};
+  rs.forEach(function(r){ var o = bt[r.tipo] || (bt[r.tipo] = { n: r.tipo, q: 0, g: 0 }); o.q++; o.g += pagoOf(r); });
+  var top = Object.keys(bt).map(function(k){ return bt[k]; }).sort(function(a, b){ return b.g - a.g; }).slice(0, 5);
+  box.innerHTML = '<div class="xgrid" style="margin-top:16px"><div class="card"><b>📆 Ganancia por día de la semana</b><div class="chart">' + svgBars(wd, DIAS_C, 0) + '</div><div class="insight"><span class="em">💡</span><span>Tu día más fuerte: <b>' + NOMS[bg] + '</b> (' + money(wd[bg]) + ' CUP).</span></div></div>' +
+    '<div class="card"><b>🔧 Lo que más te deja</b>' + rankHTML(top.map(function(o){ return { n: o.n, v: o.g, t: money(o.g) + " CUP", s: o.q + (o.q === 1 ? " trabajo" : " trabajos") }; })) + '</div></div>';
+}
+(function(){
+  var rs0 = renderStats, rt0 = renderTStats;
+  renderStats = function(){ rs0(); try { statsExtra(); } catch(e) { console.error(e); } countUp(document.getElementById("stkpi")); };
+  renderTStats = function(){ rt0(); try { statsExtraT(); } catch(e) { console.error(e); } countUp(document.getElementById("tkpi")); };
+})();
 </script>
 </body>
 </html>
