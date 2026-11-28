@@ -390,6 +390,16 @@ body:not(.cli) main::after{content:"🔧  Móviles Emanuel · Taller";position:a
 .tabb{padding:16px 10px;font-size:14.5px}
 .wafab{box-shadow:0 18px 38px -12px #16a34a,0 1px 0 #ffffff40 inset}
 ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#2a3a5e;border-radius:8px}
+/* precio en pantallas + cartel de servicios */
+.mod .mi{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mp{font-size:16px;font-weight:800;color:#fbbf24}
+.mp.ask{font-size:12px;color:#94a3b8;font-weight:600}
+.cserv{background:linear-gradient(135deg,#0f766e,#1d4ed8);color:#fff;border:1px solid #ffffff2a;border-radius:24px;padding:20px;margin:0 0 16px;box-shadow:0 24px 50px -26px #0f766e}
+.cserv h4{margin:0 0 12px;font-size:20px;font-weight:800;letter-spacing:-.01em}
+.svgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.svi{background:#0b122266;border:1px solid #ffffff2a;border-radius:14px;padding:11px 13px;display:flex;flex-direction:column;gap:3px}
+.svi b{font-size:15px}
+.svi span{font-size:13px;color:#dbeafe}
 </style>
 <style id="tema-css">
 /* ================= MODO CLARO / OSCURO + EXTRAS VISUALES ================= */
@@ -554,6 +564,7 @@ html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-colo
 <button class="nav noCli" id="n-report" onclick="show('report')">📝 Reporte diario</button>
 <button class="nav noCli" id="n-history" onclick="show('history')">📅 Historial</button>
 <button class="nav adminOnly" id="n-stats" onclick="show('stats')">📈 Estadísticas</button>
+<button class="nav adminOnly" id="n-visitas" onclick="show('visitas')">👁️ Visitas</button>
 <button class="nav noCli tecOnly" id="n-tstats" onclick="show('tstats')">💰 Mis ganancias</button>
 <button class="nav noCli" id="n-profile" onclick="show('profile')">👤 Mi perfil</button>
 <button class="nav adminOnly" id="n-pay" onclick="show('pay')">💵 Pagos técnico</button>
@@ -582,6 +593,7 @@ html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-colo
 </div>
 <div class="hcta hidden" id="hcta"></div>
 </div>
+<div class="cserv hidden" id="cserv"></div>
 <div class="tabs" id="ctabs"></div>
 <div class="csrow"><input id="cq" class="csearch" placeholder="🔍 Buscar..." oninput="renderClient()"><label class="cok"><input id="cok" type="checkbox" onchange="renderClient()"> Solo disponibles</label></div>
 <a id="wafab" class="wafab hidden" target="_blank" rel="noopener">💬 WhatsApp</a>
@@ -599,6 +611,17 @@ html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-colo
 <input id="atel" type="tel" placeholder="Teléfono / WhatsApp (ej. 5XXXXXXX)">
 <textarea id="abienv" style="grid-column:1/-1;min-height:70px" maxlength="220" placeholder="Mensaje de bienvenida para clientes (opcional). Si lo dejas vacío se usa uno por defecto."></textarea>
 <button class="green" onclick="saveTel()">Guardar contacto y bienvenida</button>
+</div>
+</div>
+
+<div class="card">
+<b>🔧 Cartel de servicios del taller</b>
+<p class="msg">Escribe un servicio por línea. Puedes poner el detalle o precio después de « — » (ej.: «📟 Cambio de pantalla — desde 1500 CUP»). Sale arriba en la vista de clientes.</p>
+<div class="grid" style="margin-top:10px">
+<input id="svtitulo" maxlength="50" placeholder="Título del cartel (ej. 🔧 Servicios del taller)">
+<label class="msg" style="display:flex;align-items:center;gap:8px"><input id="svon" type="checkbox" style="width:auto;margin:0"> Mostrar el cartel a los clientes</label>
+<textarea id="svtexto" style="grid-column:1/-1;min-height:140px" placeholder="📟 Cambio de pantalla — todas las marcas&#10;🔋 Cambio de batería&#10;🔌 Reparación de base de carga&#10;🔊 Cambio de bocina&#10;🔓 Censado y desbloqueo"></textarea>
+<button class="green" onclick="saveServ()">Guardar cartel</button>
 </div>
 </div>
 
@@ -651,9 +674,9 @@ html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-colo
 <h3>Inventario de pantallas</h3>
 <div class="stats">
 <div class="stat"><span>Modelos</span><b id="s1">0</b></div>
-<div class="stat"><span>Unidades</span><b id="s2">0</b></div>
+<div class="stat adminOnly"><span>Unidades</span><b id="s2">0</b></div>
 <div class="stat"><span>Sin stock</span><b id="s3">0</b></div>
-<div class="stat"><span>Stock bajo (≤2)</span><b id="s5">0</b></div>
+<div class="stat adminOnly"><span>Stock bajo (≤2)</span><b id="s5">0</b></div>
 <div class="stat adminOnly"><span>Valor (costo)</span><b id="s4">0</b></div>
 <div class="stat adminOnly"><span>Valor (venta)</span><b id="s6">0</b></div>
 </div>
@@ -704,9 +727,9 @@ html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-colo
 <h3>Inventario de micas, covers y cables</h3>
 <div class="stats">
 <div class="stat"><span>Artículos</span><b id="ai1">0</b></div>
-<div class="stat"><span>Unidades</span><b id="ai2">0</b></div>
+<div class="stat adminOnly"><span>Unidades</span><b id="ai2">0</b></div>
 <div class="stat"><span>Sin stock</span><b id="ai3">0</b></div>
-<div class="stat"><span>Stock bajo (≤2)</span><b id="ai5">0</b></div>
+<div class="stat adminOnly"><span>Stock bajo (≤2)</span><b id="ai5">0</b></div>
 <div class="stat adminOnly"><span>Valor (costo)</span><b id="ai4">0</b></div>
 <div class="stat adminOnly"><span>Valor (venta)</span><b id="ai6">0</b></div>
 </div>
@@ -817,6 +840,31 @@ html[data-theme="light"] [style*="border-top:1px solid #1e293b"]{border-top-colo
 <div class="scroll" style="margin-top:8px"><table style="min-width:520px"><thead><tr><th>Servicio</th><th>Cant.</th><th>Cobrado</th><th>Ganancia real</th><th>Vs período anterior</th></tr></thead><tbody id="sttb"></tbody></table></div>
 </div>
 <div id="stx"></div>
+</div>
+
+<div id="v-visitas" class="hidden">
+<h3>👁️ Visitas a la tienda</h3>
+<div class="card">
+<p class="msg">Cuenta cada vez que alguien abre la app. Tú y los técnicos no cuentan: cuando inician sesión, esa visita se descuenta y ese teléfono no se vuelve a contar. Las visitas son anónimas: no se puede saber el nombre, pero cada teléfono tiene un código (Visitante A3F9) para saber si es nuevo o si ya había vuelto.</p>
+<div class="row" style="margin-top:10px">
+<select id="vper" onchange="renderVisitas()"><option value="7">Últimos 7 días</option><option value="14" selected>Últimos 14 días</option><option value="30">Últimos 30 días</option></select>
+<button class="gray" onclick="renderVisitas()">🔄 Actualizar</button>
+</div>
+<p class="msg" id="vst" style="margin-top:8px"></p>
+</div>
+<div class="stats" id="vkpi"></div>
+<div class="card"><b>📊 Visitas por día</b><div class="chart" id="vc1"></div></div>
+<div class="card"><b>📍 De dónde llegan</b><div id="vsrc"></div></div>
+<div class="card">
+<b>🧾 Quién entró</b>
+<div class="row" style="margin:10px 0"><input id="vdate" type="date" onchange="renderVisLog()"><button class="gray" onclick="$('vdate').value=today();renderVisLog()">Hoy</button></div>
+<div id="vlog"></div>
+</div>
+<div class="card">
+<b>📘 Enlace para compartir en Facebook</b>
+<p class="msg">Las visitas se cuentan con cualquier enlace. Este, con «?src=facebook», sirve para que se marque con seguridad que vienen de Facebook (y abre directo la tienda).</p>
+<div class="row"><input id="vlink" readonly><button class="green" onclick="visCopiar()">📋 Copiar enlace</button></div>
+</div>
 </div>
 
 <div id="v-tstats" class="hidden">
@@ -1043,6 +1091,7 @@ function ensureCfg(){
   ];
   if (typeof db.cfg.tel !== "string") db.cfg.tel = "";
   if (typeof db.cfg.bienv !== "string") db.cfg.bienv = "";
+  if (!db.cfg.serv || typeof db.cfg.serv !== "object" || Array.isArray(db.cfg.serv)) db.cfg.serv = { on: 1, titulo: "🔧 Servicios del taller", lineas: "" };
   if (!Array.isArray(db.cfg.avisos)) db.cfg.avisos = avDefaults();
   if (!db.inv || typeof db.inv !== "object" || Array.isArray(db.inv))
     db.inv = { "Rep. base de carga tipo C": 200, "Cambio de base de carga": 200 };
@@ -1108,7 +1157,7 @@ function rebindMe(){
 function refreshUI(){
   if (!me) return;
   if (!rebindMe()) { alert("Tu usuario ya no existe."); logout(); return; }
-  var cur = ["client","acc","screens","accinv","report","history","stats","tstats","profile","pay","notes","users","backup"]
+  var cur = ["client","acc","screens","accinv","report","history","stats","tstats","profile","pay","notes","users","backup","visitas"]
     .filter(function(x){ return !$("v-" + x).classList.contains("hidden"); })[0] || "screens";
   var a = document.activeElement;
   var typing = a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && $("v-" + cur).contains(a);
@@ -1204,6 +1253,7 @@ function login(){
     return;
   }
   if ($("lrem").checked) saveCred(f.user, f.pass); else clearCred();
+  visStaff();
   enterApp(f);
 }
 var CRED_KEY = "moviles_cred_v1";
@@ -1232,11 +1282,155 @@ function otraCuenta(){
   $("lu").focus();
 }
 function enterClient(){ enterApp({ user: "cliente", role: "cliente" }); }
+
+/* ---------- CARTEL DE SERVICIOS ---------- */
+function saveServ(){
+  if (!isAdmin()) return;
+  db.cfg.serv = { on: $("svon").checked ? 1 : 0, titulo: $("svtitulo").value.trim() || "🔧 Servicios del taller", lineas: $("svtexto").value };
+  saveDB(); alert("Cartel de servicios guardado.");
+}
+function renderServCli(){
+  var box = $("cserv"), sv = db.cfg.serv || {};
+  var ls = String(sv.lineas || "").split("\n").map(function(l){ return l.trim(); }).filter(Boolean);
+  if (sv.on === 0 || !ls.length) { box.classList.add("hidden"); box.innerHTML = ""; return; }
+  box.classList.remove("hidden"); box.innerHTML = "";
+  box.appendChild(mk("h4", "", sv.titulo || "🔧 Servicios del taller"));
+  var g = mk("div", "svgrid");
+  ls.forEach(function(l){
+    var p = l.split(/\s+[—–|-]\s+/), it = mk("div", "svi");
+    it.appendChild(mk("b", "", p[0]));
+    if (p.length > 1) it.appendChild(mk("span", "", p.slice(1).join(" — ")));
+    g.appendChild(it);
+  });
+  box.appendChild(g);
+}
+
+/* ---------- VISITAS (anónimas, guardadas en la nube por día) ---------- */
+var VIS_SRC = { facebook: "📘 Facebook", whatsapp: "💬 WhatsApp", instagram: "📸 Instagram", otro: "🌐 Otro sitio", directo: "🔗 Directo" };
+function visSource(){
+  var ua = navigator.userAgent || "", ref = (document.referrer || "").toLowerCase(), q = (location.search || "").toLowerCase();
+  var all = ref + " " + q;
+  if (/FBAN|FBAV|FB_IAB|FBIOS/.test(ua) || /facebook|fb\.com|fb\.me|fbclid|src=(fb|facebook)|utm_source=(fb|facebook)/.test(all)) return "facebook";
+  if (/instagram/.test(ua.toLowerCase()) || /instagram|src=instagram/.test(all)) return "instagram";
+  if (/whatsapp|wa\.me|src=whatsapp/.test(all)) return "whatsapp";
+  return ref ? "otro" : "directo";
+}
+function visDevice(){
+  var ua = navigator.userAgent || "";
+  return /iPhone|iPad|iPod/.test(ua) ? "iPhone" : (/Android/.test(ua) ? "Android" : "Computadora");
+}
+var visLast = null;
+function visRegistrar(tries){
+  try {
+    if (localStorage.getItem("vis_staff") === "1" || credGet()) return;
+    if (!cloudDB) { if ((tries || 0) < 10) setTimeout(function(){ visRegistrar((tries || 0) + 1); }, 800); return; }
+    if (sessionStorage.getItem("visDone") === today()) return;
+    sessionStorage.setItem("visDone", today());
+    var vid = localStorage.getItem("vis_id"), nuevo = 0;
+    if (!vid) { vid = Math.random().toString(36).slice(2, 6).toUpperCase(); localStorage.setItem("vis_id", vid); nuevo = 1; }
+    var primeraHoy = localStorage.getItem("vis_last") !== today();
+    localStorage.setItem("vis_last", today());
+    var src = visSource(), dev = visDevice(), day = today(), entry = { h: hora(), v: vid, s: src, d: dev, n: nuevo };
+    var F = firebase.firestore.FieldValue, data = { total: F.increment(1), src: {}, dev: {}, log: F.arrayUnion(entry) };
+    data.src[src] = F.increment(1); data.dev[dev] = F.increment(1);
+    if (primeraHoy) data.uniq = F.increment(1);
+    visLast = { day: day, src: src, dev: dev, entry: entry, uniq: primeraHoy };
+    cloudDB.collection("moviles").doc("vis_" + day).set(data, { merge: true }).catch(function(){});
+  } catch(e) {}
+}
+/* Si quien abrió resulta ser admin o técnico: se marca el aparato y se descuenta la visita */
+function visStaff(){
+  try {
+    localStorage.setItem("vis_staff", "1");
+    if (!visLast || !cloudDB) return;
+    var v = visLast, F = firebase.firestore.FieldValue, data = { total: F.increment(-1), src: {}, dev: {}, log: F.arrayRemove(v.entry) };
+    data.src[v.src] = F.increment(-1); data.dev[v.dev] = F.increment(-1);
+    if (v.uniq) data.uniq = F.increment(-1);
+    visLast = null;
+    cloudDB.collection("moviles").doc("vis_" + v.day).set(data, { merge: true }).catch(function(){});
+  } catch(e) {}
+}
+function visAuto(){
+  visRegistrar();
+  if (me || credGet()) return;
+  if (/[?&](tienda|src|fbclid|utm_source)(=|&|$)/i.test(location.search)) enterClient();
+}
+window.addEventListener("load", visAuto);
+function visCopiar(){
+  var t = $("vlink").value;
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function(){ toast("📋 Enlace copiado"); }, function(){ $("vlink").select(); });
+  else { $("vlink").select(); try { document.execCommand("copy"); toast("📋 Enlace copiado"); } catch(e) {} }
+}
+function visDocs(n){
+  var out = [], d = new Date(), i;
+  for (i = n - 1; i >= 0; i--) out.push(fd(addD(d, -i)));
+  return out;
+}
+function renderVisitas(){
+  if (!isAdmin()) return;
+  $("vlink").value = location.href.split(/[?#]/)[0] + "?src=facebook";
+  if (!$("vdate").value) $("vdate").value = today();
+  if (!cloudDB) { $("vst").textContent = "☁️ Las visitas necesitan la nube (Firebase) configurada."; return; }
+  var n = Number($("vper").value) || 14, days = visDocs(n);
+  $("vst").textContent = "Cargando visitas…";
+  Promise.all(days.map(function(f){
+    return cloudDB.collection("moviles").doc("vis_" + f).get().then(function(s){ return { f: f, d: s.exists ? s.data() : {} }; })
+      .catch(function(){ return { f: f, d: {}, err: 1 }; });
+  })).then(function(rows){
+    var err = rows.filter(function(r){ return r.err; }).length;
+    $("vst").textContent = err === rows.length ? "No se pudo leer. Revisa las reglas de Firebase (colección «moviles»)." : "";
+    var tot = 0, fb = 0, srcs = {}, vals = rows.map(function(r){ return Number(r.d.total) || 0; });
+    rows.forEach(function(r){
+      tot += Number(r.d.total) || 0;
+      var s = r.d.src || {};
+      Object.keys(s).forEach(function(k){ srcs[k] = (srcs[k] || 0) + (Number(s[k]) || 0); });
+    });
+    fb = srcs.facebook || 0;
+    var hoy = rows[rows.length - 1].d, hs = hoy.src || {};
+    var kp = [
+      ["👁️ Visitas hoy", Number(hoy.total) || 0],
+      ["🧍 Visitantes únicos hoy", Number(hoy.uniq) || 0],
+      ["📘 De Facebook hoy", Number(hs.facebook) || 0],
+      ["📅 Visitas en el período", tot],
+      ["📘 Facebook en el período", fb],
+      ["📊 Promedio por día", (tot / n).toFixed(1)]
+    ];
+    $("vkpi").innerHTML = kp.map(function(k){ return '<div class="stat"><span>' + k[0] + '</span><b>' + k[1] + '</b></div>'; }).join("");
+    var labels = days.map(function(f){ return f.slice(8) + "/" + f.slice(5, 7); });
+    $("vc1").innerHTML = tot ? svgBars(vals, labels, 0).replace(/: [^<]*? CUP<\/title>/g, function(m){ return m.replace(/ CUP<\/title>$/, " visitas</title>").replace(/[.,]00(?= visitas)/, ""); }) : '<p class="msg">Todavía no hay visitas registradas en este período.</p>';
+    var list = Object.keys(srcs).map(function(k){ return { n: VIS_SRC[k] || k, v: srcs[k], t: String(srcs[k]), s: Math.round(srcs[k] / tot * 100) + "% de las visitas" }; })
+      .sort(function(a, b){ return b.v - a.v; });
+    $("vsrc").innerHTML = list.length ? rankHTML(list) : '<p class="msg">Sin datos todavía.</p>';
+    countUp($("vkpi"));
+    renderVisLog();
+  });
+}
+function renderVisLog(){
+  var f = $("vdate").value || today(), box = $("vlog");
+  if (!cloudDB) return;
+  box.innerHTML = '<p class="msg">Cargando…</p>';
+  cloudDB.collection("moviles").doc("vis_" + f).get().then(function(s){
+    box.innerHTML = "";
+    var log = s.exists && Array.isArray(s.data().log) ? s.data().log.slice() : [];
+    if (!log.length) { box.appendChild(mk("p", "msg", "No hay visitas registradas ese día.")); return; }
+    log.sort(function(a, b){ return a.h < b.h ? 1 : (a.h > b.h ? -1 : 0); });
+    log.forEach(function(e){
+      var d = mk("div", "item"), tx = mk("div", "tx");
+      tx.appendChild(mk("span", "", "Visitante " + e.v));
+      tx.appendChild(mk("small", "", e.h + " · " + (VIS_SRC[e.s] || e.s) + " · " + e.d + " · " + (e.n ? "🆕 Primera vez" : "🔁 Ya había visitado antes")));
+      d.appendChild(tx); box.appendChild(d);
+    });
+  }).catch(function(){ box.innerHTML = '<p class="msg">No se pudo leer el detalle.</p>'; });
+}
 function enterApp(f){
   me = f; $("err").textContent = "";
   $("login").classList.add("hidden"); $("app").classList.remove("hidden");
   document.body.classList.toggle("tech", !isAdmin());
   document.body.classList.toggle("cli", f.role === "cliente");
+  Array.prototype.forEach.call(document.querySelectorAll('option[value="low"], option[value="cant"]'), function(o){
+    o.hidden = !isAdmin(); o.disabled = !isAdmin();
+    if (!isAdmin() && o.selected) o.parentNode.value = o.parentNode.options[0].value;
+  });
   updateWho();
   show(f.role === "cliente" ? "client" : "screens");
 }
@@ -1253,9 +1447,9 @@ function logout(){
 
 function show(v){
   if (me && me.role === "cliente") v = "client";
-  if ((v === "users" || v === "backup" || v === "pay" || v === "acc" || v === "stats") && !isAdmin()) v = "screens";
+  if ((v === "users" || v === "backup" || v === "pay" || v === "acc" || v === "stats" || v === "visitas") && !isAdmin()) v = "screens";
   if (v === "tstats" && (!me || me.role !== "tecnico")) v = isAdmin() ? "stats" : "screens";
-  ["client","acc","screens","accinv","report","history","stats","tstats","profile","pay","notes","proto","users","backup"].forEach(function(x){
+  ["client","acc","screens","accinv","report","history","stats","tstats","profile","pay","notes","proto","users","backup","visitas"].forEach(function(x){
     $("n-" + x).classList.toggle("on", x === v);
     $("v-" + x).classList.toggle("hidden", x !== v);
   });
@@ -1271,6 +1465,7 @@ function show(v){
   if (v === "backup") renderBackup();
   if (v === "client") renderClient();
   if (v === "acc") renderAcc();
+  if (v === "visitas") renderVisitas();
   if (v === "stats") renderStats();
   if (v === "tstats") renderTStats();
   updateTopbar();
@@ -1317,7 +1512,9 @@ function renderScreens(){
     n.textContent = s.cant;
     n.className = s.cant === 0 ? "zero" : (s.cant <= LOW ? "low" : "");
     var plus = btn("+", "gray adminOnly", function(){ adjust(s.id, 1); });
+    n.className += " adminOnly";
     w.appendChild(minus); w.appendChild(n); w.appendChild(plus);
+    w.appendChild(mk("span", "tecOnly " + (s.cant === 0 ? "zero" : ""), s.cant === 0 ? "Agotado" : "Disponible"));
     tq.appendChild(w); tr.appendChild(tq);
 
     tr.appendChild(cell(money(s.costo), "adminOnly"));
@@ -1440,8 +1637,10 @@ function renderAccInv(){
     var n = document.createElement("span"); n.textContent = c;
     n.className = c === 0 ? "zero" : (c <= LOW ? "low" : "");
     w.appendChild(btn("−", "gray adminOnly", function(){ adjustAcc(a.id, -1); }));
+    n.className += " adminOnly";
     w.appendChild(n);
     w.appendChild(btn("+", "gray adminOnly", function(){ adjustAcc(a.id, 1); }));
+    w.appendChild(mk("span", "tecOnly " + (c === 0 ? "zero" : ""), c === 0 ? "Agotado" : "Disponible"));
     tq.appendChild(w); tr.appendChild(tq);
     var costo = Number(a.costo) || 0, precio = Number(a.precio) || 0;
     tr.appendChild(cell(money(costo), "adminOnly"));
@@ -1688,6 +1887,7 @@ function renderClient(){
     if (w) { fab.href = w; fab.classList.remove("hidden"); } else fab.classList.add("hidden");
   } else { h.classList.add("hidden"); fab.classList.add("hidden"); }
 
+  renderServCli();
   var tb = $("ctabs"); tb.innerHTML = "";
   tabs.forEach(function(t){
     var b = mk("button", "tabb" + (t.k === cliTab ? " on" : ""), t.i + " " + t.n + " (" + t.c + ")");
@@ -1710,7 +1910,9 @@ function renderCliScreens(box, q){
     var sec = mk("div", "brand"); var h4 = mk("h4", "", m); h4.appendChild(mk("small", "", by[m].length + (by[m].length === 1 ? " modelo" : " modelos"))); sec.appendChild(h4);
     var g = mk("div", "mods");
     by[m].forEach(function(s){
-      var d = mk("div", "mod"); d.appendChild(mk("b", "", s.modelo));
+      var d = mk("div", "mod"); var mi = mk("div", "mi"); mi.appendChild(mk("b", "", s.modelo));
+      mi.appendChild(Number(s.venta) > 0 ? mk("span", "mp", Number(s.venta) + " CUP") : mk("span", "mp ask", "Consulta el precio"));
+      d.appendChild(mi);
       d.appendChild(mk("span", "pill " + (s.cant > 0 ? "on" : "off"), s.cant > 0 ? "Disponible" : "No disponible"));
       g.appendChild(d);
     });
@@ -1813,6 +2015,10 @@ function renderAcc(){
   if (!isAdmin()) return;
   if (document.activeElement !== $("atel")) $("atel").value = db.cfg.tel || "";
   if (document.activeElement !== $("abienv")) $("abienv").value = db.cfg.bienv || "";
+  var sv = db.cfg.serv || {};
+  if (document.activeElement !== $("svtexto")) $("svtexto").value = sv.lineas || "";
+  if (document.activeElement !== $("svtitulo")) $("svtitulo").value = sv.titulo || "";
+  $("svon").checked = sv.on !== 0;
   renderCats(); fillCatSelect();
   var box = $("acclist"); box.innerHTML = "";
   if (!db.accesorios.length) { box.innerHTML = '<p class="msg">Aún no has agregado artículos.</p>'; return; }
@@ -1950,7 +2156,7 @@ function render(){
     var last = null;
     s.forEach(function(x){
       if (x[0] !== last) { last = x[0]; h += '<h2>' + esc(x[0]) + '<\/h2>'; }
-      h += '<div class="it"><b>' + esc(x[1]) + '<\/b>' + est(x[2]) + '<\/div>';
+      h += '<div class="it"><b>' + esc(x[1]) + '<\/b>' + (x[3] > 0 ? '<span class="pr">' + x[3] + ' CUP<\/span>' : '') + est(x[2]) + '<\/div>';
     });
     if (!s.length) h = '<p class="msg">No hay resultados.<\/p>';
   } else {
@@ -1972,7 +2178,7 @@ function exportCatalogo(){
     if (hecho) return; hecho = true;
     var data = {
       i: ICONOS(),
-      s: db.screens.map(function(x){ return [x.marca, x.modelo, x.cant > 0 ? 1 : 0]; }),
+      s: db.screens.map(function(x){ return [x.marca, x.modelo, x.cant > 0 ? 1 : 0, Number(x.venta) || 0]; }),
       a: db.accesorios.map(function(x){ return [x.tipo, x.nombre, x.disp ? 1 : 0, x.precio || 0, x.foto ? (FOTOS[x.foto] || "") : "", x.desc || ""]; }),
       t: db.cfg.tel || "",
       k: catList().map(function(c){ return [c.n, c.i || "🛍️"]; })
@@ -2282,7 +2488,7 @@ function renderReport(){
   var o0 = document.createElement("option"); o0.value = ""; o0.textContent = "— Elige la pantalla —"; ps.appendChild(o0);
   db.screens.slice().sort(function(a, b){ return screenName(a).localeCompare(screenName(b)); }).forEach(function(s){
     var o = document.createElement("option"); o.value = s.id;
-    o.textContent = screenName(s) + (s.cant === 0 ? " (sin stock)" : " (" + s.cant + ")");
+    o.textContent = screenName(s) + (s.cant === 0 ? " (sin stock)" : (isAdmin() ? " (" + s.cant + ")" : ""));
     ps.appendChild(o);
   });
   ps.value = prev;
@@ -2319,7 +2525,7 @@ function reportType(){
     var a0 = document.createElement("option"); a0.value = ""; a0.textContent = "— Elige " + cat.toLowerCase() + " —"; as.appendChild(a0);
     db.accesorios.filter(function(a){ return a.tipo === cat; }).sort(function(a, b){ return a.nombre.localeCompare(b.nombre); }).forEach(function(a){
       var o = document.createElement("option"); o.value = a.id;
-      o.textContent = a.nombre + ((a.cant || 0) <= 0 ? " (sin stock)" : " (" + a.cant + ")"); as.appendChild(o);
+      o.textContent = a.nombre + ((a.cant || 0) <= 0 ? " (sin stock)" : (isAdmin() ? " (" + a.cant + ")" : "")); as.appendChild(o);
     });
     as.value = prevA;
   }
